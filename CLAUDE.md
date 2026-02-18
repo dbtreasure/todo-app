@@ -113,3 +113,27 @@ TypeScript path alias `@/*` maps to `./src/*`. Use `@/components/button` instead
 - **Dialog-based UX.** Create, edit, and delete operations all use Catalyst Dialog modals instead of navigating to separate pages.
 - **Server component data fetching.** The page fetches data on the server and passes it down. The client component only manages UI state (which dialog is open, which todo is selected).
 - **Todos are sorted newest-first** by `createdAt` descending.
+
+---
+
+## Demo Environment: TypeScript SDK Setup
+
+This branch is configured for **Video 17.3: TypeScript SDK Setup** in the Claude Code Enterprise Development course.
+
+### Topic
+Setting up the Claude Code Agent SDK in TypeScript — installation, configuration, basic agent creation, and error handling.
+
+### Files Added
+- `agent-sdk/typescript/package.json` — Dependencies
+- `agent-sdk/typescript/tsconfig.json` — TypeScript configuration
+- `agent-sdk/typescript/.env.example` — API key template
+- `agent-sdk/typescript/src/first-agent.ts` — Basic agent
+- `agent-sdk/typescript/src/first-agent-with-error-handling.ts` — Agent with error handling
+
+### Usage
+```bash
+cd agent-sdk/typescript
+npm install
+cp .env.example .env  # fill in your API key
+npx tsx src/first-agent.ts
+```
