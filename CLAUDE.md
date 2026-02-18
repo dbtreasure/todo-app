@@ -113,3 +113,26 @@ TypeScript path alias `@/*` maps to `./src/*`. Use `@/components/button` instead
 - **Dialog-based UX.** Create, edit, and delete operations all use Catalyst Dialog modals instead of navigating to separate pages.
 - **Server component data fetching.** The page fetches data on the server and passes it down. The client component only manages UI state (which dialog is open, which todo is selected).
 - **Todos are sorted newest-first** by `createdAt` descending.
+
+---
+
+## Demo Environment: Best Practices for Effective Use
+
+This branch is configured for **Video 18.1: Best Practices for Effective Use** in the Claude Code Enterprise Development course.
+
+### Topic
+Comprehensive best practices — CLAUDE.md design, agent architecture, cost optimization, security patterns, and SDK workflows.
+
+### Files Added
+- `.claude/settings.json` — Combined best practices (hooks + autoCompact)
+- `.claude/agents/SecurityAuditor/AGENT.md` — Read-only security auditor (haiku)
+- `.claude/agents/Architect/AGENT.md` — Architecture reviewer (opus)
+- `.claude/skills/ValidateJSON/SKILL.md` — JSON validation skill
+- `scripts/validate-bash-command.sh` — Bash validation hook script
+- `agent-sdk/python/plan_review_execute.py` — Three-agent pattern
+- `agent-sdk/python/read_only_then_write.py` — Read-only analyzer + write-capable refactorer
+- `agent-sdk/python/requirements.txt` — Python dependencies
+- `agent-sdk/python/.env.example` — API key template
+
+### Usage
+This branch demonstrates all best practices together. Review each file as an example of production-quality configuration.
