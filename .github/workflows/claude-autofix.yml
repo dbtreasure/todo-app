@@ -1,0 +1,38 @@
+name: Claude Auto-Fix
+
+on:
+  push:
+    branches-ignore:
+      - main
+    paths:
+      - '**.ts'
+      - '**.tsx'
+
+jobs:
+  claude-autofix:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run Claude Auto-Fix
+        uses: anthropics/claude-code-action@beta
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          prompt: |
+            Check the recently changed TypeScript files for:
+            - Type errors (run: npx tsc --noEmit)
+            - Lint issues (run: npm run lint)
+            Fix any issues found and commit the changes.
+          allowed_tools: "Bash,Read,Write,Edit"

@@ -113,3 +113,20 @@ TypeScript path alias `@/*` maps to `./src/*`. Use `@/components/button` instead
 - **Dialog-based UX.** Create, edit, and delete operations all use Catalyst Dialog modals instead of navigating to separate pages.
 - **Server component data fetching.** The page fetches data on the server and passes it down. The client component only manages UI state (which dialog is open, which todo is selected).
 - **Todos are sorted newest-first** by `createdAt` descending.
+
+
+---
+
+## Demo Environment: GitHub Actions
+
+This branch is configured for **Video 14.1: GitHub Actions** in the Claude Code Enterprise Development course.
+
+### Topic
+Integrating Claude Code into GitHub Actions workflows for automated PR review and code fixes.
+
+### Files Added
+- `.github/workflows/claude-review.yml` — PR review workflow using claude-code-action
+- `.github/workflows/claude-autofix.yml` — Auto-fix workflow for TypeScript changes
+
+### Usage
+Push this branch and open a PR to see the review workflow trigger. The autofix workflow runs on pushes to feature branches when .ts/.tsx files change.
