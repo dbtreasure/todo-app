@@ -113,3 +113,20 @@ TypeScript path alias `@/*` maps to `./src/*`. Use `@/components/button` instead
 - **Dialog-based UX.** Create, edit, and delete operations all use Catalyst Dialog modals instead of navigating to separate pages.
 - **Server component data fetching.** The page fetches data on the server and passes it down. The client component only manages UI state (which dialog is open, which todo is selected).
 - **Todos are sorted newest-first** by `createdAt` descending.
+
+
+---
+
+## Demo Environment: Subagents
+
+This branch is configured for **Video 13.1: Subagents** in the Claude Code Enterprise Development course.
+
+### Topic
+Creating and using custom subagents — specialized AI roles with their own models, tools, and permissions.
+
+### Files Added
+- `.claude/agents/SecurityAuditor/AGENT.md` — Read-only security auditor (haiku, maxTurns 5)
+- `.claude/agents/CodeFormatter/AGENT.md` — Code formatter with PostToolUse hook
+
+### Usage
+Run `/agents` in Claude Code to see the custom agents. Ask Claude to "audit this code for security issues" to trigger the SecurityAuditor.
