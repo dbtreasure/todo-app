@@ -16,7 +16,10 @@
     },
     "postgres": {
       "command": "./postgres-mcp-server",
-      "args": ["--connection", "postgresql://user:pass@localhost/mydb"]
+      "args": ["--connection", "${POSTGRES_CONNECTION_STRING}"],
+      "env": {
+        "POSTGRES_CONNECTION_STRING": "${POSTGRES_CONNECTION_STRING}"
+      }
     }
   }
 }
