@@ -113,3 +113,21 @@ TypeScript path alias `@/*` maps to `./src/*`. Use `@/components/button` instead
 - **Dialog-based UX.** Create, edit, and delete operations all use Catalyst Dialog modals instead of navigating to separate pages.
 - **Server component data fetching.** The page fetches data on the server and passes it down. The client component only manages UI state (which dialog is open, which todo is selected).
 - **Todos are sorted newest-first** by `createdAt` descending.
+
+---
+
+## Demo Environment: Building Custom MCP Servers
+
+This branch is configured for **Video 16.5: Building Custom MCP Servers** in the Claude Code Enterprise Development course.
+
+### Topic
+Building a production-grade custom MCP server with FastMCP — input validation, credential isolation, error handling.
+
+### Files Added
+- `.claude/settings.json` — Custom user-service MCP registration
+- `mcp-server/user_service.py` — Full FastMCP server with user management tools
+- `mcp-server/requirements.txt` — Python dependencies
+- `mcp-server/.env.example` — API credentials
+
+### Usage
+Install deps and set credentials. The MCP server exposes user management tools to Claude Code.
