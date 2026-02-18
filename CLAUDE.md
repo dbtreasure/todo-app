@@ -113,3 +113,22 @@ TypeScript path alias `@/*` maps to `./src/*`. Use `@/components/button` instead
 - **Dialog-based UX.** Create, edit, and delete operations all use Catalyst Dialog modals instead of navigating to separate pages.
 - **Server component data fetching.** The page fetches data on the server and passes it down. The client component only manages UI state (which dialog is open, which todo is selected).
 - **Todos are sorted newest-first** by `createdAt` descending.
+
+---
+
+## Demo Environment: Slack Integration
+
+This branch is configured for **Video 16.3: Slack Integration** in the Claude Code Enterprise Development course.
+
+### Topic
+Reading Slack channels and threads via a custom MCP server. Channel summarization and context gathering.
+
+### Files Added
+- `.claude/settings.json` — Slack MCP server configuration
+- `mcp-server/slack-mcp.py` — Python FastMCP Slack server
+- `mcp-server/requirements.txt` — Python dependencies
+- `.env.example` — Slack bot credentials
+
+### Usage
+Install deps: `cd mcp-server && uv pip install -r requirements.txt`
+Set Slack credentials in `.env`. Claude Code can then read channels and threads.
