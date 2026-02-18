@@ -113,3 +113,26 @@ TypeScript path alias `@/*` maps to `./src/*`. Use `@/components/button` instead
 - **Dialog-based UX.** Create, edit, and delete operations all use Catalyst Dialog modals instead of navigating to separate pages.
 - **Server component data fetching.** The page fetches data on the server and passes it down. The client component only manages UI state (which dialog is open, which todo is selected).
 - **Todos are sorted newest-first** by `createdAt` descending.
+
+---
+
+## Demo Environment: Python SDK Setup
+
+This branch is configured for **Video 17.2: Python SDK Setup** in the Claude Code Enterprise Development course.
+
+### Topic
+Setting up the Claude Code Agent SDK in Python — installation, configuration, basic agent creation, and error handling.
+
+### Files Added
+- `agent-sdk/python/requirements.txt` — Python dependencies
+- `agent-sdk/python/.env.example` — API key template
+- `agent-sdk/python/first_agent.py` — Basic agent script
+- `agent-sdk/python/first_agent_with_error_handling.py` — Agent with logging and error handling
+
+### Usage
+```bash
+cd agent-sdk/python
+uv pip install -r requirements.txt
+cp .env.example .env  # fill in your API key
+uv run first_agent.py
+```
