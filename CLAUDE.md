@@ -113,3 +113,26 @@ TypeScript path alias `@/*` maps to `./src/*`. Use `@/components/button` instead
 - **Dialog-based UX.** Create, edit, and delete operations all use Catalyst Dialog modals instead of navigating to separate pages.
 - **Server component data fetching.** The page fetches data on the server and passes it down. The client component only manages UI state (which dialog is open, which todo is selected).
 - **Todos are sorted newest-first** by `createdAt` descending.
+
+---
+
+## Demo Environment: Handling Permissions
+
+This branch is configured for **Video 17.5: Handling Permissions** in the Claude Code Enterprise Development course.
+
+### Topic
+Permission management in the SDK — delegate mode, human-in-the-loop approval, and role-based access control.
+
+### Files Added
+- `agent-sdk/python/permission_callback.py` — Delegate mode with read/write rules
+- `agent-sdk/python/human_approval.py` — Terminal-based human-in-the-loop
+- `agent-sdk/python/role_based_permissions.py` — Viewer/developer/admin RBAC
+- `agent-sdk/python/requirements.txt` — Python dependencies
+- `agent-sdk/python/.env.example` — API key template
+
+### Usage
+```bash
+uv run agent-sdk/python/permission_callback.py
+uv run agent-sdk/python/human_approval.py
+uv run agent-sdk/python/role_based_permissions.py
+```
