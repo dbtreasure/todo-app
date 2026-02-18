@@ -113,3 +113,19 @@ TypeScript path alias `@/*` maps to `./src/*`. Use `@/components/button` instead
 - **Dialog-based UX.** Create, edit, and delete operations all use Catalyst Dialog modals instead of navigating to separate pages.
 - **Server component data fetching.** The page fetches data on the server and passes it down. The client component only manages UI state (which dialog is open, which todo is selected).
 - **Todos are sorted newest-first** by `createdAt` descending.
+
+---
+
+## Demo Environment: Identity and Access Management
+
+This branch is configured for **Video 15.4: Identity and Access Management** in the Claude Code Enterprise Development course.
+
+### Topic
+RBAC roles, service accounts, tool allowlists/denylists, and credential management.
+
+### Files Added
+- `enterprise-config/iam-policy.json` — RBAC policy with roles and service accounts
+- `enterprise-config/tool-allowlist.json` — Tool permission configuration
+
+### Usage
+Review the JSON files for IAM and permission patterns.

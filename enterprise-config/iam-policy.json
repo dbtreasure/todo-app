@@ -1,0 +1,60 @@
+{
+  "version": "1.0",
+  "description": "RBAC policy for Claude Code enterprise deployment",
+  "roles": {
+    "backend-engineer": {
+      "description": "Full access to application source code, read-only for infrastructure",
+      "permissions": {
+        "allowedTools": ["Read", "Write", "Edit", "Bash", "Grep", "Glob"],
+        "allowedPaths": ["src/**", "tests/**", "package.json", "tsconfig.json"],
+        "readOnlyPaths": ["infrastructure/**", ".github/**", "Dockerfile"],
+        "deniedPaths": [".env", "*.key", "*.pem", "secrets/**"],
+        "maxTurnsPerSession": 100,
+        "allowedModels": ["claude-sonnet-4-5-20250929", "claude-haiku-4-5-20251001"]
+      }
+    },
+    "devops-engineer": {
+      "description": "Full access to infrastructure, CI/CD, and deployment configurations",
+      "permissions": {
+        "allowedTools": ["Read", "Write", "Edit", "Bash", "Grep", "Glob"],
+        "allowedPaths": ["infrastructure/**", ".github/**", "Dockerfile", "docker-compose.yml"],
+        "readOnlyPaths": ["src/**"],
+        "deniedPaths": ["*.key", "*.pem"],
+        "maxTurnsPerSession": 100,
+        "allowedModels": ["claude-sonnet-4-5-20250929", "claude-haiku-4-5-20251001"]
+      }
+    },
+    "junior-developer": {
+      "description": "Read access with limited write. Requires approval for Bash.",
+      "permissions": {
+        "allowedTools": ["Read", "Grep", "Glob", "Edit"],
+        "deniedTools": ["Bash"],
+        "allowedPaths": ["src/**"],
+        "deniedPaths": [".env", "*.key", "*.pem", "infrastructure/**"],
+        "maxTurnsPerSession": 30,
+        "allowedModels": ["claude-haiku-4-5-20251001"]
+      }
+    }
+  },
+  "serviceAccounts": {
+    "ci-reviewer": {
+      "description": "CI/CD service account for automated code review",
+      "permissions": {
+        "allowedTools": ["Read", "Grep", "Glob"],
+        "permissionMode": "read-only",
+        "maxTurnsPerSession": 10,
+        "allowedModels": ["claude-haiku-4-5-20251001"]
+      }
+    },
+    "ci-autofix": {
+      "description": "CI/CD service account for automated fixes",
+      "permissions": {
+        "allowedTools": ["Read", "Write", "Edit", "Grep", "Glob", "Bash"],
+        "allowedPaths": ["src/**", "tests/**"],
+        "deniedPaths": [".env", "infrastructure/**"],
+        "maxTurnsPerSession": 20,
+        "allowedModels": ["claude-sonnet-4-5-20250929"]
+      }
+    }
+  }
+}
