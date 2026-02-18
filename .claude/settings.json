@@ -1,0 +1,24 @@
+{
+  "mcpServers": {
+    "github": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-github"],
+      "env": {
+        "GITHUB_PERSONAL_ACCESS_TOKEN": "${GITHUB_TOKEN}"
+      }
+    },
+    "postgres": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-postgres", "${DATABASE_URL}"]
+    },
+    "internal-api": {
+      "command": "uv",
+      "args": ["run", "mcp-server/server.py"],
+      "env": {
+        "INTERNAL_API_URL": "${INTERNAL_API_URL}",
+        "INTERNAL_API_TOKEN": "${INTERNAL_API_TOKEN}",
+        "DB_CONNECTION": "${DB_CONNECTION}"
+      }
+    }
+  }
+}

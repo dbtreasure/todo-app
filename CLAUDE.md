@@ -113,3 +113,22 @@ TypeScript path alias `@/*` maps to `./src/*`. Use `@/components/button` instead
 - **Dialog-based UX.** Create, edit, and delete operations all use Catalyst Dialog modals instead of navigating to separate pages.
 - **Server component data fetching.** The page fetches data on the server and passes it down. The client component only manages UI state (which dialog is open, which todo is selected).
 - **Todos are sorted newest-first** by `createdAt` descending.
+
+
+---
+
+## Demo Environment: MCP Servers
+
+This branch is configured for **Video 13.5: MCP Servers** in the Claude Code Enterprise Development course.
+
+### Topic
+External system integration via Model Context Protocol — connecting Claude Code to databases, APIs, and services.
+
+### Files Added
+- `.claude/settings.json` — MCP server configurations (github, postgres examples)
+- `mcp-server/server.py` — FastMCP server with get_database_records and create_issue tools
+- `mcp-server/requirements.txt` — Python dependencies
+- `mcp-server/.env.example` — Environment variables
+
+### Usage
+Install dependencies with `cd mcp-server && uv pip install -r requirements.txt`, then configure `.env` from `.env.example`. The MCP server runs via `uv run mcp-server/server.py`.
