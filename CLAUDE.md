@@ -113,3 +113,20 @@ TypeScript path alias `@/*` maps to `./src/*`. Use `@/components/button` instead
 - **Dialog-based UX.** Create, edit, and delete operations all use Catalyst Dialog modals instead of navigating to separate pages.
 - **Server component data fetching.** The page fetches data on the server and passes it down. The client component only manages UI state (which dialog is open, which todo is selected).
 - **Todos are sorted newest-first** by `createdAt` descending.
+
+---
+
+## Demo Environment: Database Connections
+
+This branch is configured for **Video 16.1: Database Connections** in the Claude Code Enterprise Development course.
+
+### Topic
+Connecting Claude Code to PostgreSQL and MySQL databases via MCP servers. Read-only access patterns and schema analysis.
+
+### Files Added
+- `.claude/settings.json` — PostgreSQL and MySQL MCP server configurations
+- `scripts/setup-readonly-db-user.sql` — PostgreSQL read-only role setup
+- `.env.example` — Database connection strings
+
+### Usage
+Set up a read-only database user with the SQL script, then configure connection strings in `.env`.
