@@ -113,3 +113,24 @@ TypeScript path alias `@/*` maps to `./src/*`. Use `@/components/button` instead
 - **Dialog-based UX.** Create, edit, and delete operations all use Catalyst Dialog modals instead of navigating to separate pages.
 - **Server component data fetching.** The page fetches data on the server and passes it down. The client component only manages UI state (which dialog is open, which todo is selected).
 - **Todos are sorted newest-first** by `createdAt` descending.
+
+---
+
+## Demo Environment: MCP in the SDK
+
+This branch is configured for **Video 17.8: MCP in the SDK** in the Claude Code Enterprise Development course.
+
+### Topic
+Using MCP servers from the Agent SDK — connecting to external services, managing multiple MCP connections.
+
+### Files Added
+- `agent-sdk/python/agent_with_mcp.py` — Single MCPConnection + agent integration
+- `agent-sdk/python/multi_mcp_agent.py` — Multiple MCP connections
+- `agent-sdk/python/requirements.txt` — Python dependencies
+- `agent-sdk/python/.env.example` — API key template
+
+### Usage
+```bash
+uv run agent-sdk/python/agent_with_mcp.py
+uv run agent-sdk/python/multi_mcp_agent.py
+```
