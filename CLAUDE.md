@@ -120,16 +120,12 @@ TypeScript path alias `@/*` maps to `./src/*`. Use `@/components/button` instead
 This branch is prepared for the **Plugins** video demo (13.4).
 
 ### Topic
-Packaging agents, skills, and hooks into reusable plugin bundles using Claude Code's plugin system.
+The Claude Code plugin marketplace: discovering, installing, and using plugins. Uses `frontend-design` from `claude-plugins-official` as the real-world example.
 
-### Files Added
-- `plugins/code-quality/.claude-plugin/plugin.json` — Plugin manifest (name, version, description, author)
-- `plugins/code-quality/agents/CodeReviewer/AGENT.md` — Read-only code reviewer (sonnet, maxTurns 8)
-- `plugins/code-quality/skills/GenerateTests/SKILL.md` — Test generation skill (sonnet, user-invocable)
-- `plugins/code-quality/skills/ValidateSchema/SKILL.md` — Schema validation skill (haiku, user-invocable)
-
-### Loading the Plugin
-```bash
-claude --plugin-dir ./plugins/code-quality
-```
-This loads the plugin for the session. The CodeReviewer agent appears in `/agents`, and GenerateTests/ValidateSchema skills appear in `/skills` (namespaced as `code-quality:GenerateTests` and `code-quality:ValidateSchema`).
+### Demo Flow
+1. Open `/plugin` — show the tabbed UI (Plugins, Discover, Installed, Marketplaces)
+2. Browse Discover tab — find `frontend-design` (183K+ installs, by Anthropic)
+3. Show plugin details — description, author, trust warning, three installation scopes
+4. Install it (local scope for demo)
+5. Show Installed tab — verify it's loaded
+6. Use it — ask Claude to build a landing page for the todo app and show the design quality difference

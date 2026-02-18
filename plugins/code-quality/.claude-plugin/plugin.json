@@ -1,9 +1,0 @@
-{
-  "name": "code-quality",
-  "version": "1.0.0",
-  "description": "Code quality review and test generation agents and skills.",
-  "author": {
-    "name": "Enterprise Dev Team"
-  },
-  "license": "MIT"
-}
