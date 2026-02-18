@@ -113,3 +113,21 @@ TypeScript path alias `@/*` maps to `./src/*`. Use `@/components/button` instead
 - **Dialog-based UX.** Create, edit, and delete operations all use Catalyst Dialog modals instead of navigating to separate pages.
 - **Server component data fetching.** The page fetches data on the server and passes it down. The client component only manages UI state (which dialog is open, which todo is selected).
 - **Todos are sorted newest-first** by `createdAt` descending.
+
+
+---
+
+## Demo Environment: Hooks
+
+This branch is configured for **Video 13.2: Hooks** in the Claude Code Enterprise Development course.
+
+### Topic
+Automated guardrails using PreToolUse, PostToolUse, and PostToolUseFailure hooks.
+
+### Files Added
+- `.claude/settings.json` — Hook configurations for bash validation, prettier, and audit logging
+- `scripts/validate-bash-command.sh` — Blocks dangerous bash command patterns
+- `.claude/agents/CodeFormatter/AGENT.md` — Agent with embedded hooks
+
+### Usage
+The hooks activate automatically when Claude Code uses tools. Try running a dangerous command like `rm -rf /` to see the PreToolUse hook block it.
