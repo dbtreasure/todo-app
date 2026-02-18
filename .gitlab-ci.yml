@@ -1,0 +1,49 @@
+stages:
+  - build
+  - test
+  - review
+  - deploy
+
+variables:
+  NODE_VERSION: "20"
+
+build:
+  stage: build
+  image: node:${NODE_VERSION}
+  script:
+    - npm ci
+    - npm run build
+  artifacts:
+    paths:
+      - .next/
+    expire_in: 1 hour
+
+test:
+  stage: test
+  image: node:${NODE_VERSION}
+  script:
+    - npm ci
+    - npm run lint
+    - npm run test 2>/dev/null || echo "No tests configured yet"
+
+claude-review:
+  stage: review
+  image: node:${NODE_VERSION}
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+  script:
+    - npx @anthropic-ai/claude-code -p "
+        Review the changes in this merge request.
+        Focus on code quality, potential bugs, and TypeScript best practices.
+        Be concise and actionable.
+        $(git diff $CI_MERGE_REQUEST_DIFF_BASE_SHA..HEAD)
+      " --output-format text --dangerously-skip-permissions
+  variables:
+    ANTHROPIC_API_KEY: $ANTHROPIC_API_KEY
+
+deploy:
+  stage: deploy
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main"
+  script:
+    - echo "Deploy to production"

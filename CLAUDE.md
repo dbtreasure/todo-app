@@ -113,3 +113,20 @@ TypeScript path alias `@/*` maps to `./src/*`. Use `@/components/button` instead
 - **Dialog-based UX.** Create, edit, and delete operations all use Catalyst Dialog modals instead of navigating to separate pages.
 - **Server component data fetching.** The page fetches data on the server and passes it down. The client component only manages UI state (which dialog is open, which todo is selected).
 - **Todos are sorted newest-first** by `createdAt` descending.
+
+
+---
+
+## Demo Environment: GitLab CI/CD Integration
+
+This branch is configured for **Video 14.2: GitLab CI/CD Integration** in the Claude Code Enterprise Development course.
+
+### Topic
+Running Claude Code in GitLab CI pipelines for merge request analysis and code review.
+
+### Files Added
+- `.gitlab-ci.yml` — Full pipeline with build, test, review, and deploy stages
+- `.gitlab-ci-claude-analyze.yml` — Structured JSON output variant
+
+### Usage
+These files are templates for GitLab CI integration. Copy to a GitLab repository and configure the ANTHROPIC_API_KEY CI/CD variable.

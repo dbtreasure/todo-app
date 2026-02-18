@@ -1,0 +1,26 @@
+# Variant: Claude analysis with structured JSON output as CI artifact
+
+claude-analyze:
+  stage: review
+  image: node:${NODE_VERSION:-20}
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+  script:
+    - |
+      npx @anthropic-ai/claude-code -p "
+        Analyze the code changes and output a JSON report with this schema:
+        {
+          "summary": "one-line summary",
+          "risk_level": "low|medium|high",
+          "issues": [{"file": "...", "line": N, "severity": "...", "message": "..."}],
+          "suggestions": ["..."]
+        }
+        Changes:
+        $(git diff $CI_MERGE_REQUEST_DIFF_BASE_SHA..HEAD)
+      " --output-format json --dangerously-skip-permissions > claude-report.json
+  artifacts:
+    paths:
+      - claude-report.json
+    expire_in: 30 days
+  variables:
+    ANTHROPIC_API_KEY: $ANTHROPIC_API_KEY
