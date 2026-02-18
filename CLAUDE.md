@@ -115,20 +115,15 @@ TypeScript path alias `@/*` maps to `./src/*`. Use `@/components/button` instead
 - **Todos are sorted newest-first** by `createdAt` descending.
 
 
----
+## Video Demo Context
 
-## Demo Environment: Agent Skills
-
-This branch is configured for **Video 13.3: Agent Skills** in the Claude Code Enterprise Development course.
+This branch is prepared for the **Agent Skills** video demo (13.3).
 
 ### Topic
-Predefined capabilities via SKILL.md — user-invocable skills, dynamic context, extended thinking, and multi-argument skills.
+Creating reusable skills with SKILL.md files. Demonstrates user-invocable skills, dynamic context with backtick commands, ultrathink, and multi-argument skills.
 
 ### Files Added
-- `.claude/skills/ValidateJSON/SKILL.md` — JSON validation (haiku, user-invocable)
-- `.claude/skills/FetchRecentCommits/SKILL.md` — Dynamic backtick context (Explore fork)
-- `.claude/skills/ArchitectReview/SKILL.md` — Extended thinking, not user-invocable
-- `.claude/skills/GenerateTestSuite/SKILL.md` — Multiple arguments, sonnet model
-
-### Usage
-Run `/skills ValidateJSON <file>` or `/skills FetchRecentCommits` to invoke skills directly.
+- `.claude/skills/ValidateJSON/SKILL.md` — JSON validation skill (haiku, user-invocable)
+- `.claude/skills/FetchRecentCommits/SKILL.md` — Dynamic backtick context skill (Explore agent fork)
+- `.claude/skills/ArchitectReview/SKILL.md` — Architecture review with ultrathink (not user-invocable)
+- `.claude/skills/GenerateTestSuite/SKILL.md` — Test generation with multiple arguments (sonnet)

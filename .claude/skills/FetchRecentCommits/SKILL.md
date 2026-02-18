@@ -1,19 +1,16 @@
 ---
 name: FetchRecentCommits
-description: "Returns recent commits in the current repository with context."
-argument-hint: "[--max N]"
+description: "Returns recent commits in the current repository."
+argument-hint: "--max N"
 allowed-tools: [Bash]
 user-invocable: true
 context: fork
 agent: Explore
 ---
 
-Latest commits in this repo:
+Latest 5 commits in this repo:
 ```
-`git log --oneline -n 10`
+`git log --oneline -n 5`
 ```
 
-Current branch: `git branch --show-current`
-
-Summarize the recent commit activity. Focus on what changed and any patterns
-(e.g., feature work, bug fixes, refactoring). Be concise.
+Summarize their purpose and impact. Focus on what changed, not the details.
