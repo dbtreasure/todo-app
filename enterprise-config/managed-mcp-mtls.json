@@ -1,0 +1,14 @@
+{
+  "mcpServers": {
+    "internal-api": {
+      "command": "node",
+      "args": ["internal-mcp-server/dist/index.js"],
+      "env": {
+        "API_URL": "https://api.internal.corp.example.com",
+        "CLIENT_CERT": "${MTLS_CLIENT_CERT}",
+        "CLIENT_KEY": "${MTLS_CLIENT_KEY}",
+        "CA_CERT": "${NODE_EXTRA_CA_CERTS}"
+      }
+    }
+  }
+}

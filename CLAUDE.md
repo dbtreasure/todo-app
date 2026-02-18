@@ -113,3 +113,21 @@ TypeScript path alias `@/*` maps to `./src/*`. Use `@/components/button` instead
 - **Dialog-based UX.** Create, edit, and delete operations all use Catalyst Dialog modals instead of navigating to separate pages.
 - **Server component data fetching.** The page fetches data on the server and passes it down. The client component only manages UI state (which dialog is open, which todo is selected).
 - **Todos are sorted newest-first** by `createdAt` descending.
+
+---
+
+## Demo Environment: Network and Security Configuration
+
+This branch is configured for **Video 15.3: Network and Security Configuration** in the Claude Code Enterprise Development course.
+
+### Topic
+HTTP proxy configuration, custom CA certificates, mTLS authentication, and network auditing.
+
+### Files Added
+- `enterprise-config/.env.example` — Proxy, CA cert, and mTLS environment variables
+- `enterprise-config/managed-mcp-mtls.json` — MCP config with mTLS client certificates
+- `enterprise-config/generate-client-cert.sh` — OpenSSL script for mTLS cert generation
+- `enterprise-config/network-audit.sh` — Network verification commands
+
+### Usage
+Review configurations for enterprise network patterns. Run `generate-client-cert.sh` to create test certificates.
