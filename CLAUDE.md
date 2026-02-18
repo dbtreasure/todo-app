@@ -113,3 +113,22 @@ TypeScript path alias `@/*` maps to `./src/*`. Use `@/components/button` instead
 - **Dialog-based UX.** Create, edit, and delete operations all use Catalyst Dialog modals instead of navigating to separate pages.
 - **Server component data fetching.** The page fetches data on the server and passes it down. The client component only manages UI state (which dialog is open, which todo is selected).
 - **Todos are sorted newest-first** by `createdAt` descending.
+
+
+---
+
+## Demo Environment: Agent Skills
+
+This branch is configured for **Video 13.3: Agent Skills** in the Claude Code Enterprise Development course.
+
+### Topic
+Predefined capabilities via SKILL.md — user-invocable skills, dynamic context, extended thinking, and multi-argument skills.
+
+### Files Added
+- `.claude/skills/ValidateJSON/SKILL.md` — JSON validation (haiku, user-invocable)
+- `.claude/skills/FetchRecentCommits/SKILL.md` — Dynamic backtick context (Explore fork)
+- `.claude/skills/ArchitectReview/SKILL.md` — Extended thinking, not user-invocable
+- `.claude/skills/GenerateTestSuite/SKILL.md` — Multiple arguments, sonnet model
+
+### Usage
+Run `/skills ValidateJSON <file>` or `/skills FetchRecentCommits` to invoke skills directly.
