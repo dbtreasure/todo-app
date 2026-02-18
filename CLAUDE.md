@@ -113,3 +113,22 @@ TypeScript path alias `@/*` maps to `./src/*`. Use `@/components/button` instead
 - **Dialog-based UX.** Create, edit, and delete operations all use Catalyst Dialog modals instead of navigating to separate pages.
 - **Server component data fetching.** The page fetches data on the server and passes it down. The client component only manages UI state (which dialog is open, which todo is selected).
 - **Todos are sorted newest-first** by `createdAt` descending.
+
+
+---
+
+## Demo Environment: Plugins
+
+This branch is configured for **Video 13.4: Plugins** in the Claude Code Enterprise Development course.
+
+### Topic
+Reusable extension packages that bundle agents, skills, and hooks into installable units.
+
+### Files Added
+- `.claude/plugins/code-quality/plugin.json` — Plugin metadata
+- `.claude/plugins/code-quality/agents/CodeReviewer/AGENT.md` — Read-only code reviewer (sonnet)
+- `.claude/plugins/code-quality/skills/GenerateTests/SKILL.md` — Test generation skill
+- `.claude/plugins/code-quality/skills/ValidateSchema/SKILL.md` — Schema validation skill
+
+### Usage
+The plugin agents and skills appear automatically in `/agents` and `/skills` lists.
