@@ -113,3 +113,22 @@ TypeScript path alias `@/*` maps to `./src/*`. Use `@/components/button` instead
 - **Dialog-based UX.** Create, edit, and delete operations all use Catalyst Dialog modals instead of navigating to separate pages.
 - **Server component data fetching.** The page fetches data on the server and passes it down. The client component only manages UI state (which dialog is open, which todo is selected).
 - **Todos are sorted newest-first** by `createdAt` descending.
+
+---
+
+## Demo Environment: Subagents in the SDK
+
+This branch is configured for **Video 17.9: Subagents in the SDK** in the Claude Code Enterprise Development course.
+
+### Topic
+Multi-agent architectures — parent coordinator with specialist child agents running in parallel.
+
+### Files Added
+- `agent-sdk/python/subagent_hierarchy.py` — Parent coordinator + 3 specialist reviewers (security, performance, style) with asyncio.gather
+- `agent-sdk/python/requirements.txt` — Python dependencies
+- `agent-sdk/python/.env.example` — API key template
+
+### Usage
+```bash
+uv run agent-sdk/python/subagent_hierarchy.py
+```
