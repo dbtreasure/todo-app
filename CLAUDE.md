@@ -113,3 +113,19 @@ TypeScript path alias `@/*` maps to `./src/*`. Use `@/components/button` instead
 - **Dialog-based UX.** Create, edit, and delete operations all use Catalyst Dialog modals instead of navigating to separate pages.
 - **Server component data fetching.** The page fetches data on the server and passes it down. The client component only manages UI state (which dialog is open, which todo is selected).
 - **Todos are sorted newest-first** by `createdAt` descending.
+
+---
+
+## Demo Environment: Jira for Enterprise Teams
+
+This branch is configured for **Video 16.4: Jira for Enterprise Teams** in the Claude Code Enterprise Development course.
+
+### Topic
+Connecting Claude Code to Jira via MCP for sprint analysis, issue management, and project visibility.
+
+### Files Added
+- `.claude/settings.json` — Jira MCP server configuration
+- `.env.example` — Jira authentication variables
+
+### Usage
+Set your Jira credentials in `.env`. Claude Code can then query issues, sprints, and boards.
