@@ -113,3 +113,20 @@ TypeScript path alias `@/*` maps to `./src/*`. Use `@/components/button` instead
 - **Dialog-based UX.** Create, edit, and delete operations all use Catalyst Dialog modals instead of navigating to separate pages.
 - **Server component data fetching.** The page fetches data on the server and passes it down. The client component only manages UI state (which dialog is open, which todo is selected).
 - **Todos are sorted newest-first** by `createdAt` descending.
+
+
+---
+
+## Demo Environment: Claude as Unix Utility
+
+This branch is configured for **Video 14.4: Claude as Unix Utility** in the Claude Code Enterprise Development course.
+
+### Topic
+Using Claude Code in Unix pipelines — stdin/stdout piping, chaining, JSON schemas, and automated reports.
+
+### Files Added
+- `scripts/unix-pipe-examples.sh` — Pipe examples with git diff, chaining, and JSON schemas
+- `scripts/daily-code-health-report.sh` — Daily code health report generator
+
+### Usage
+Review the documented examples. Run the daily report with `bash scripts/daily-code-health-report.sh`.
