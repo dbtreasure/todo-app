@@ -113,3 +113,24 @@ TypeScript path alias `@/*` maps to `./src/*`. Use `@/components/button` instead
 - **Dialog-based UX.** Create, edit, and delete operations all use Catalyst Dialog modals instead of navigating to separate pages.
 - **Server component data fetching.** The page fetches data on the server and passes it down. The client component only manages UI state (which dialog is open, which todo is selected).
 - **Todos are sorted newest-first** by `createdAt` descending.
+
+---
+
+## Demo Environment: Streaming Input and Output
+
+This branch is configured for **Video 17.4: Streaming Input and Output** in the Claude Code Enterprise Development course.
+
+### Topic
+Streaming responses from agents in real-time and handling large file input with chunking.
+
+### Files Added
+- `agent-sdk/python/streaming_output.py` — Async streaming with event handling
+- `agent-sdk/python/streaming_input.py` — Large file chunked input
+- `agent-sdk/python/requirements.txt` — Python dependencies
+- `agent-sdk/python/.env.example` — API key template
+
+### Usage
+```bash
+uv run agent-sdk/python/streaming_output.py
+uv run agent-sdk/python/streaming_input.py
+```
