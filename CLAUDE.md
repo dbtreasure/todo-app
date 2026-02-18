@@ -115,20 +115,15 @@ TypeScript path alias `@/*` maps to `./src/*`. Use `@/components/button` instead
 - **Todos are sorted newest-first** by `createdAt` descending.
 
 
----
+## Video Demo Context
 
-## Demo Environment: MCP Servers
-
-This branch is configured for **Video 13.5: MCP Servers** in the Claude Code Enterprise Development course.
+This branch is prepared for the **MCP Servers** video demo (13.5).
 
 ### Topic
-External system integration via Model Context Protocol — connecting Claude Code to databases, APIs, and services.
+Model Context Protocol (MCP) servers for external system integration. Configuring MCP servers in settings.json and building custom servers with FastMCP.
 
 ### Files Added
 - `.claude/settings.json` — MCP server configurations (github, postgres examples)
-- `mcp-server/server.py` — FastMCP server with get_database_records and create_issue tools
+- `mcp-server/server.py` — FastMCP skeleton with get_database_records and create_issue tools
 - `mcp-server/requirements.txt` — Python dependencies
-- `mcp-server/.env.example` — Environment variables
-
-### Usage
-Install dependencies with `cd mcp-server && uv pip install -r requirements.txt`, then configure `.env` from `.env.example`. The MCP server runs via `uv run mcp-server/server.py`.
+- `mcp-server/.env.example` — Environment variable template
