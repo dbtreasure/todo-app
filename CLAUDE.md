@@ -113,3 +113,19 @@ TypeScript path alias `@/*` maps to `./src/*`. Use `@/components/button` instead
 - **Dialog-based UX.** Create, edit, and delete operations all use Catalyst Dialog modals instead of navigating to separate pages.
 - **Server component data fetching.** The page fetches data on the server and passes it down. The client component only manages UI state (which dialog is open, which todo is selected).
 - **Todos are sorted newest-first** by `createdAt` descending.
+
+---
+
+## Demo Environment: Sentry for Error Monitoring
+
+This branch is configured for **Video 16.2: Sentry for Error Monitoring** in the Claude Code Enterprise Development course.
+
+### Topic
+Connecting Claude Code to Sentry via MCP for error analysis, root cause diagnosis, and fix generation.
+
+### Files Added
+- `.claude/settings.json` — Sentry MCP server configuration
+- `.env.example` — Sentry authentication variables
+
+### Usage
+Set your Sentry credentials in `.env` and Claude Code can query error data directly.
