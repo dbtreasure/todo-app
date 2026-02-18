@@ -115,18 +115,13 @@ TypeScript path alias `@/*` maps to `./src/*`. Use `@/components/button` instead
 - **Todos are sorted newest-first** by `createdAt` descending.
 
 
----
+## Video Demo Context
 
-## Demo Environment: Subagents
-
-This branch is configured for **Video 13.1: Subagents** in the Claude Code Enterprise Development course.
+This branch is prepared for the **Subagents** video demo (13.1).
 
 ### Topic
-Creating and using custom subagents — specialized AI roles with their own models, tools, and permissions.
+Creating specialized subagents with custom AGENT.md files. Demonstrates read-only agents with restricted tools, model selection, and turn limits.
 
 ### Files Added
-- `.claude/agents/SecurityAuditor/AGENT.md` — Read-only security auditor (haiku, maxTurns 5)
+- `.claude/agents/SecurityAuditor/AGENT.md` — Read-only security auditor (haiku model, limited tools)
 - `.claude/agents/CodeFormatter/AGENT.md` — Code formatter with PostToolUse hook
-
-### Usage
-Run `/agents` in Claude Code to see the custom agents. Ask Claude to "audit this code for security issues" to trigger the SecurityAuditor.
