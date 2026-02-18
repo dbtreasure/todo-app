@@ -120,10 +120,16 @@ TypeScript path alias `@/*` maps to `./src/*`. Use `@/components/button` instead
 This branch is prepared for the **Plugins** video demo (13.4).
 
 ### Topic
-Packaging agents, skills, and hooks into reusable plugin bundles with plugin.json metadata.
+Packaging agents, skills, and hooks into reusable plugin bundles using Claude Code's plugin system.
 
 ### Files Added
-- `.claude/plugins/code-quality/plugin.json` — Plugin metadata
-- `.claude/plugins/code-quality/agents/CodeReviewer/AGENT.md` — Read-only code reviewer (sonnet, maxTurns 8)
-- `.claude/plugins/code-quality/skills/GenerateTests/SKILL.md` — Test generation skill
-- `.claude/plugins/code-quality/skills/ValidateSchema/SKILL.md` — Schema validation skill
+- `plugins/code-quality/.claude-plugin/plugin.json` — Plugin manifest (name, version, description, author)
+- `plugins/code-quality/agents/CodeReviewer/AGENT.md` — Read-only code reviewer (sonnet, maxTurns 8)
+- `plugins/code-quality/skills/GenerateTests/SKILL.md` — Test generation skill (sonnet, user-invocable)
+- `plugins/code-quality/skills/ValidateSchema/SKILL.md` — Schema validation skill (haiku, user-invocable)
+
+### Loading the Plugin
+```bash
+claude --plugin-dir ./plugins/code-quality
+```
+This loads the plugin for the session. The CodeReviewer agent appears in `/agents`, and GenerateTests/ValidateSchema skills appear in `/skills` (namespaced as `code-quality:GenerateTests` and `code-quality:ValidateSchema`).
