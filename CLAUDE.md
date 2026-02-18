@@ -113,3 +113,19 @@ TypeScript path alias `@/*` maps to `./src/*`. Use `@/components/button` instead
 - **Dialog-based UX.** Create, edit, and delete operations all use Catalyst Dialog modals instead of navigating to separate pages.
 - **Server component data fetching.** The page fetches data on the server and passes it down. The client component only manages UI state (which dialog is open, which todo is selected).
 - **Todos are sorted newest-first** by `createdAt` descending.
+
+---
+
+## Demo Environment: Cloud Provider Setup
+
+This branch is configured for **Video 15.2: Cloud Provider Setup** in the Claude Code Enterprise Development course.
+
+### Topic
+Configuring Claude Code with AWS Bedrock, Google Vertex AI, and Azure AI Foundry for enterprise cloud deployments.
+
+### Files Added
+- `enterprise-config/.env.example` — Environment variables for all three providers
+- `enterprise-config/verify-cloud-setup.sh` — Verification script for provider connectivity
+
+### Usage
+Copy `.env.example` to `.env`, fill in your provider credentials, and run `verify-cloud-setup.sh`.
