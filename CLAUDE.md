@@ -113,3 +113,29 @@ TypeScript path alias `@/*` maps to `./src/*`. Use `@/components/button` instead
 - **Dialog-based UX.** Create, edit, and delete operations all use Catalyst Dialog modals instead of navigating to separate pages.
 - **Server component data fetching.** The page fetches data on the server and passes it down. The client component only manages UI state (which dialog is open, which todo is selected).
 - **Todos are sorted newest-first** by `createdAt` descending.
+
+---
+
+## Demo Environment: Hosting and Deployment
+
+This branch is configured for **Video 17.10: Hosting and Deployment** in the Claude Code Enterprise Development course.
+
+### Topic
+Deploying agent services — FastAPI wrapper, health checks, Docker containerization, Kubernetes deployment, and local development with docker-compose.
+
+### Files Added
+- `agent-sdk/python/agent_service.py` — FastAPI wrapper with /health, /agent/run, /metrics
+- `agent-sdk/python/requirements.txt` — Python dependencies (with FastAPI and uvicorn)
+- `agent-sdk/python/.env.example` — API key template
+- `agent-sdk/Dockerfile` — Python 3.11-slim container with healthcheck
+- `agent-sdk/deployment.yaml` — Kubernetes deployment (3 replicas, resource limits, probes)
+- `agent-sdk/docker-compose.yml` — Local development compose file
+
+### Usage
+```bash
+# Local development
+cd agent-sdk && docker compose up
+
+# Or run directly
+uv run agent-sdk/python/agent_service.py
+```
