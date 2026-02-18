@@ -22,7 +22,7 @@
         ]
       },
       {
-        "matcher": "*",
+        "matcher": ".*",
         "hooks": [
           {
             "type": "command",
@@ -33,7 +33,7 @@
     ],
     "PostToolUseFailure": [
       {
-        "matcher": "*",
+        "matcher": ".*",
         "hooks": [
           {
             "type": "command",
