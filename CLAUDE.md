@@ -113,3 +113,19 @@ TypeScript path alias `@/*` maps to `./src/*`. Use `@/components/button` instead
 - **Dialog-based UX.** Create, edit, and delete operations all use Catalyst Dialog modals instead of navigating to separate pages.
 - **Server component data fetching.** The page fetches data on the server and passes it down. The client component only manages UI state (which dialog is open, which todo is selected).
 - **Todos are sorted newest-first** by `createdAt` descending.
+
+---
+
+## Demo Environment: Enterprise Overview
+
+This branch is configured for **Video 15.1: Enterprise Overview** in the Claude Code Enterprise Development course.
+
+### Topic
+Enterprise deployment models — centralized vs team-based vs hybrid governance, managed MCP policies, and permission scoping.
+
+### Files Added
+- `enterprise-config/managed-mcp.json` — Centralized policy configuration
+- `enterprise-config/README.md` — Deployment model documentation
+
+### Usage
+Review the managed-mcp.json for enterprise governance patterns.
