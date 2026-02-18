@@ -1,15 +1,21 @@
 ---
 name: CodeFormatter
-description: "Formats code and validates style after editing."
-tools: [Write, Edit, Bash]
-model: haiku
+description: "Formats code using project conventions. Has embedded hooks for auto-formatting."
+tools:
+  - Read
+  - Edit
+  - Write
+  - Bash
+model: sonnet
 hooks:
-  - event: PostToolUse
-    matcher: "Write|Edit"
-    hooks:
-      - type: command
-        command: "npx prettier --check {filepath} && npx eslint {filepath}"
+  PostToolUse:
+    - matcher: "Edit|Write"
+      command: "npx prettier --write $FILE_PATH && npx eslint --fix $FILE_PATH 2>/dev/null || true"
 ---
 
-You are a code formatter. After making edits, ensure code is properly formatted
-and passes linting. Fix any issues found by prettier or eslint.
+You are a code formatter. When asked to format code:
+1. Read the target file(s)
+2. Apply consistent formatting
+3. The embedded hooks will automatically run prettier and eslint after each edit
+
+Focus on consistency with the project's existing style.

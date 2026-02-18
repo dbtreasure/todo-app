@@ -115,19 +115,14 @@ TypeScript path alias `@/*` maps to `./src/*`. Use `@/components/button` instead
 - **Todos are sorted newest-first** by `createdAt` descending.
 
 
----
+## Video Demo Context
 
-## Demo Environment: Hooks
-
-This branch is configured for **Video 13.2: Hooks** in the Claude Code Enterprise Development course.
+This branch is prepared for the **Hooks** video demo (13.2).
 
 ### Topic
-Automated guardrails using PreToolUse, PostToolUse, and PostToolUseFailure hooks.
+Claude Code hooks system — PreToolUse, PostToolUse, and PostToolUseFailure hooks for automated validation, formatting, and notifications.
 
 ### Files Added
-- `.claude/settings.json` — Hook configurations for bash validation, prettier, and audit logging
-- `scripts/validate-bash-command.sh` — Blocks dangerous bash command patterns
+- `.claude/settings.json` — Hook configurations (bash validation, prettier formatting, audit logging)
+- `scripts/validate-bash-command.sh` — PreToolUse hook that blocks dangerous bash patterns
 - `.claude/agents/CodeFormatter/AGENT.md` — Agent with embedded hooks
-
-### Usage
-The hooks activate automatically when Claude Code uses tools. Try running a dangerous command like `rm -rf /` to see the PreToolUse hook block it.
