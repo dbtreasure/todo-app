@@ -113,3 +113,20 @@ TypeScript path alias `@/*` maps to `./src/*`. Use `@/components/button` instead
 - **Dialog-based UX.** Create, edit, and delete operations all use Catalyst Dialog modals instead of navigating to separate pages.
 - **Server component data fetching.** The page fetches data on the server and passes it down. The client component only manages UI state (which dialog is open, which todo is selected).
 - **Todos are sorted newest-first** by `createdAt` descending.
+
+---
+
+## Demo Environment: Agent SDK Overview
+
+This branch is configured for **Video 17.1: Agent SDK Overview** in the Claude Code Enterprise Development course.
+
+### Topic
+Introduction to the Claude Code Agent SDK — when to use the SDK vs the CLI, minimal agent examples in Python and TypeScript.
+
+### Files Added
+- `agent-sdk/python/overview_example.py` — Minimal Python agent
+- `agent-sdk/typescript/overview-example.ts` — Minimal TypeScript agent
+- `agent-sdk/README.md` — CLI vs SDK decision tree
+
+### Usage
+Run the Python example: `uv run agent-sdk/python/overview_example.py`
