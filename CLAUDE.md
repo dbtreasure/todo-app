@@ -115,20 +115,15 @@ TypeScript path alias `@/*` maps to `./src/*`. Use `@/components/button` instead
 - **Todos are sorted newest-first** by `createdAt` descending.
 
 
----
+## Video Demo Context
 
-## Demo Environment: Plugins
-
-This branch is configured for **Video 13.4: Plugins** in the Claude Code Enterprise Development course.
+This branch is prepared for the **Plugins** video demo (13.4).
 
 ### Topic
-Reusable extension packages that bundle agents, skills, and hooks into installable units.
+Packaging agents, skills, and hooks into reusable plugin bundles with plugin.json metadata.
 
 ### Files Added
 - `.claude/plugins/code-quality/plugin.json` — Plugin metadata
-- `.claude/plugins/code-quality/agents/CodeReviewer/AGENT.md` — Read-only code reviewer (sonnet)
+- `.claude/plugins/code-quality/agents/CodeReviewer/AGENT.md` — Read-only code reviewer (sonnet, maxTurns 8)
 - `.claude/plugins/code-quality/skills/GenerateTests/SKILL.md` — Test generation skill
 - `.claude/plugins/code-quality/skills/ValidateSchema/SKILL.md` — Schema validation skill
-
-### Usage
-The plugin agents and skills appear automatically in `/agents` and `/skills` lists.

@@ -10,9 +10,9 @@ model: sonnet
 Generate comprehensive pytest tests for the functions in $ARGUMENTS[0].
 
 Include:
-- Happy path tests with realistic data
-- Edge cases (empty input, None, boundary values)
-- Error handling tests (expected exceptions)
-- Parametrized tests where appropriate
+- Unit tests for each function
+- Edge case coverage
+- Mock external dependencies
+- Docstring-based test discovery
 
-Follow the project's existing test patterns. Place the test file adjacent to the source.
+Output: test_*.py file in the same directory.

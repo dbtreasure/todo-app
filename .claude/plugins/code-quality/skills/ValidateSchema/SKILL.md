@@ -1,18 +1,18 @@
 ---
 name: ValidateSchema
-description: "Validates data files against JSON Schema or TypeScript types."
+description: "Validates data files against JSON Schema definitions."
 argument-hint: "<data-file> <schema-file>"
 allowed-tools: [Read, Bash]
 user-invocable: true
 model: haiku
 ---
 
-Validate the data file at $ARGUMENTS[0] against the schema at $ARGUMENTS[1].
+Validate $ARGUMENTS[0] against the schema in $ARGUMENTS[1].
 
 Steps:
-1. Read both files
-2. Determine schema type (JSON Schema, TypeScript interface, Zod schema)
-3. Validate the data against the schema
-4. Report: valid/invalid, list of errors with paths, suggestions for fixes
+1. Read the data file
+2. Read the schema file
+3. Validate using JSON Schema rules
+4. Report: valid/invalid with specific error locations
 
-Be concise and actionable.
+Return structured output with validation results.
