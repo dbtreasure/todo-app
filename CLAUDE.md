@@ -113,3 +113,24 @@ TypeScript path alias `@/*` maps to `./src/*`. Use `@/components/button` instead
 - **Dialog-based UX.** Create, edit, and delete operations all use Catalyst Dialog modals instead of navigating to separate pages.
 - **Server component data fetching.** The page fetches data on the server and passes it down. The client component only manages UI state (which dialog is open, which todo is selected).
 - **Todos are sorted newest-first** by `createdAt` descending.
+
+---
+
+## Demo Environment: Session Management
+
+This branch is configured for **Video 17.6: Session Management** in the Claude Code Enterprise Development course.
+
+### Topic
+Session persistence — creating, resuming, and managing multi-day agent sessions.
+
+### Files Added
+- `agent-sdk/python/session_workflow.py` — Multi-day task with session persistence
+- `agent-sdk/python/manage_sessions.py` — Session creation, listing, and cleanup
+- `agent-sdk/python/requirements.txt` — Python dependencies
+- `agent-sdk/python/.env.example` — API key template
+
+### Usage
+```bash
+uv run agent-sdk/python/session_workflow.py
+uv run agent-sdk/python/manage_sessions.py
+```
