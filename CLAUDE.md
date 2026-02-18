@@ -113,3 +113,21 @@ TypeScript path alias `@/*` maps to `./src/*`. Use `@/components/button` instead
 - **Dialog-based UX.** Create, edit, and delete operations all use Catalyst Dialog modals instead of navigating to separate pages.
 - **Server component data fetching.** The page fetches data on the server and passes it down. The client component only manages UI state (which dialog is open, which todo is selected).
 - **Todos are sorted newest-first** by `createdAt` descending.
+
+---
+
+## Demo Environment: Cost Management
+
+This branch is configured for **Video 15.6: Cost Management** in the Claude Code Enterprise Development course.
+
+### Topic
+Token economics, model selection for cost optimization, budget controls, and context management.
+
+### Files Added
+- `.claude/agents/Linter/AGENT.md` — Cost-optimized linting agent (haiku)
+- `.claude/agents/Architect/AGENT.md` — High-capability architecture agent (opus)
+- `.claude/settings.json` — Settings with autoCompact enabled
+- `enterprise-config/cost-management.md` — Model tiers and budget documentation
+
+### Usage
+Use `/agents` to see agents optimized for different cost tiers. The Linter runs on haiku (cheap) while the Architect runs on opus (expensive but capable).
