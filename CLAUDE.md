@@ -113,3 +113,20 @@ TypeScript path alias `@/*` maps to `./src/*`. Use `@/components/button` instead
 - **Dialog-based UX.** Create, edit, and delete operations all use Catalyst Dialog modals instead of navigating to separate pages.
 - **Server component data fetching.** The page fetches data on the server and passes it down. The client component only manages UI state (which dialog is open, which todo is selected).
 - **Todos are sorted newest-first** by `createdAt` descending.
+
+
+---
+
+## Demo Environment: Headless Mode
+
+This branch is configured for **Video 14.3: Headless Mode** in the Claude Code Enterprise Development course.
+
+### Topic
+Non-interactive Claude Code usage — dangerously-skip-permissions, tool whitelisting, JSON output, budget caps, and piping.
+
+### Files Added
+- `scripts/headless-examples.sh` — Documented headless usage examples
+- `scripts/ci-automation.sh` — Complete CI/CD headless integration script
+
+### Usage
+Review the scripts for documented examples. Run individual examples with `bash scripts/headless-examples.sh`.
