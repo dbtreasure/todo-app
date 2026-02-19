@@ -51,11 +51,11 @@ echo ""
 
 # mTLS client certificate
 echo "── mTLS Client Certificate ──"
-if [ -n "${MTLS_CLIENT_CERT:-}" ] && [ -f "${MTLS_CLIENT_CERT:-}" ]; then
-    echo "  [OK] Client cert exists: $MTLS_CLIENT_CERT"
-    openssl x509 -in "$MTLS_CLIENT_CERT" -noout -subject -dates 2>/dev/null || true
+if [ -n "${CLAUDE_CODE_CLIENT_CERT:-}" ] && [ -f "${CLAUDE_CODE_CLIENT_CERT:-}" ]; then
+    echo "  [OK] Client cert exists: $CLAUDE_CODE_CLIENT_CERT"
+    openssl x509 -in "$CLAUDE_CODE_CLIENT_CERT" -noout -subject -dates 2>/dev/null || true
 else
-    echo "  [SKIP] MTLS_CLIENT_CERT not set or file not found"
+    echo "  [SKIP] CLAUDE_CODE_CLIENT_CERT not set or file not found"
 fi
 echo ""
 
