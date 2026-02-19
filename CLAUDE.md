@@ -121,16 +121,19 @@ TypeScript path alias `@/*` maps to `./src/*`. Use `@/components/button` instead
 This branch is configured for **Video 17.7: Custom Tools in the SDK** in the Claude Code Enterprise Development course.
 
 ### Topic
-Defining custom tools with JSON Schema, handling tool calls, and integrating with external APIs.
+Defining custom tools as MCP servers using FastMCP, registering them via `mcp_servers` in `ClaudeAgentOptions`, and invoking them through the SDK's `query()` function.
 
 ### Files Added
-- `agent-sdk/python/custom_tools.py` — calculate_fibonacci tool with schema
-- `agent-sdk/python/api_integration_tools.py` — get_customer_data + create_invoice tools
-- `agent-sdk/python/requirements.txt` — Python dependencies
-- `agent-sdk/python/.env.example` — API key template
+- `agent-sdk/python/custom_tools.py` -- Fibonacci calculator as a FastMCP server
+- `agent-sdk/python/api_integration_tools.py` -- get_customer_data + create_invoice tools as FastMCP server with httpx
+- `agent-sdk/python/requirements.txt` -- Python dependencies (claude-agent-sdk, mcp, httpx, python-dotenv)
+- `agent-sdk/python/.env.example` -- API key template
 
 ### Usage
 ```bash
-uv run agent-sdk/python/custom_tools.py
-uv run agent-sdk/python/api_integration_tools.py
+cd /tmp/work
+uv venv /tmp/py-env && source /tmp/py-env/bin/activate
+uv pip install claude-agent-sdk mcp python-dotenv httpx
+python3 agent-sdk/python/custom_tools.py
+python3 agent-sdk/python/api_integration_tools.py
 ```
