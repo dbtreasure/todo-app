@@ -1,46 +1,65 @@
 """
-Agent with MCP — Single Connection
+Agent with MCP -- Playwright Browser Automation
 
-Demonstrates connecting an agent to an MCP server, making the server's
-tools available to the agent.
+Demonstrates configuring an external MCP server via dict config in
+ClaudeAgentOptions and using query() to run a prompt with MCP tools.
+
+No MCPConnection class -- just a plain dict in mcp_servers.
 
 Usage:
     uv run agent-sdk/python/agent_with_mcp.py
 """
 
 import asyncio
+import sys
 
 from dotenv import load_dotenv
 
-from claude_code_sdk import ClaudeCodeAgent, AgentConfig, MCPConnection
+from claude_agent_sdk import (
+    AssistantMessage,
+    ClaudeAgentOptions,
+    ResultMessage,
+    TextBlock,
+    query,
+)
 
 load_dotenv()
 
+if sys.platform == "win32":
+    asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
+
 
 async def main():
-    # Connect to a PostgreSQL MCP server
-    mcp = MCPConnection(
-        name="postgres",
-        command="npx",
-        args=["-y", "@modelcontextprotocol/server-postgres",
-              "postgresql://localhost:5432/todoDb"],
+    options = ClaudeAgentOptions(
+        mcp_servers={
+            "playwright": {
+                "command": "npx",
+                "args": ["@playwright/mcp@latest"],
+            },
+        },
+        allowed_tools=[
+            "mcp__playwright__browser_navigate",
+            "mcp__playwright__browser_snapshot",
+            "mcp__playwright__browser_click",
+            "mcp__playwright__browser_type",
+        ],
+        permission_mode="bypassPermissions",
+        model="claude-sonnet-4-5",
     )
 
-    agent = ClaudeCodeAgent(
-        config=AgentConfig(
-            model="sonnet",
-            permission_mode="read-only",
-            max_turns=10,
+    async for message in query(
+        prompt=(
+            "Navigate to https://news.ycombinator.com and take a snapshot. "
+            "List the top 5 stories currently on the front page."
         ),
-        mcp_connections=[mcp],
-    )
-
-    result = await agent.run(
-        "Query the database to list all tables and their schemas. "
-        "Then show me the 5 most recent todos."
-    )
-
-    print(result.text)
+        options=options,
+    ):
+        if isinstance(message, AssistantMessage):
+            for block in message.content:
+                if isinstance(block, TextBlock):
+                    print(block.text)
+        elif isinstance(message, ResultMessage):
+            print(f"Session: {message.session_id}")
 
 
 if __name__ == "__main__":

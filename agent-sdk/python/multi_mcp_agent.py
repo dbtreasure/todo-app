@@ -1,8 +1,11 @@
 """
-Multi-MCP Agent — Multiple Connections
+Multi-MCP Agent -- Multiple Server Configurations
 
-Demonstrates an agent connected to multiple MCP servers simultaneously,
-combining tools from different services.
+Demonstrates an agent connected to multiple MCP servers simultaneously:
+one stdio-based server and one SSE-based server. Shows how to restrict
+which MCP tools the agent can use via allowed_tools.
+
+No MCPConnection class -- just plain dicts in mcp_servers.
 
 Usage:
     uv run agent-sdk/python/multi_mcp_agent.py
@@ -10,47 +13,72 @@ Usage:
 
 import asyncio
 import os
+import sys
 
 from dotenv import load_dotenv
 
-from claude_code_sdk import ClaudeCodeAgent, AgentConfig, MCPConnection
+from claude_agent_sdk import (
+    AssistantMessage,
+    ClaudeAgentOptions,
+    ResultMessage,
+    TextBlock,
+    query,
+)
 
 load_dotenv()
 
+if sys.platform == "win32":
+    asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
+
 
 async def main():
-    # Database connection
-    db_mcp = MCPConnection(
-        name="postgres",
-        command="npx",
-        args=["-y", "@modelcontextprotocol/server-postgres",
-              os.environ.get("DATABASE_URL", "postgresql://localhost:5432/todoDb")],
+    # Stdio-based MCP server (filesystem access)
+    filesystem_server = {
+        "command": "npx",
+        "args": [
+            "-y",
+            "@modelcontextprotocol/server-filesystem",
+            os.environ.get("MCP_FILESYSTEM_ROOT", "/tmp"),
+        ],
+    }
+
+    # SSE-based MCP server (remote API)
+    api_server = {
+        "type": "sse",
+        "url": os.environ.get("MCP_API_SERVER_URL", "http://localhost:3001/sse"),
+        "headers": {
+            "Authorization": f"Bearer {os.environ.get('MCP_API_TOKEN', '')}",
+        },
+    }
+
+    options = ClaudeAgentOptions(
+        mcp_servers={
+            "filesystem": filesystem_server,
+            "api_server": api_server,
+        },
+        allowed_tools=[
+            "mcp__filesystem__read_file",
+            "mcp__filesystem__list_directory",
+            "mcp__api_server__get_data",
+            "mcp__api_server__search",
+        ],
+        permission_mode="bypassPermissions",
+        model="claude-sonnet-4-5",
     )
 
-    # GitHub connection
-    github_mcp = MCPConnection(
-        name="github",
-        command="npx",
-        args=["-y", "@modelcontextprotocol/server-github"],
-        env={"GITHUB_PERSONAL_ACCESS_TOKEN": os.environ.get("GITHUB_TOKEN", "")},
-    )
-
-    agent = ClaudeCodeAgent(
-        config=AgentConfig(
-            model="sonnet",
-            permission_mode="read-only",
-            max_turns=10,
+    async for message in query(
+        prompt=(
+            "List the files in the configured root directory, then read any "
+            "README or configuration files you find. Summarize what you learn."
         ),
-        mcp_connections=[db_mcp, github_mcp],
-    )
-
-    result = await agent.run(
-        "Check the database for todos with 'bug' in the title, then search "
-        "GitHub issues in the current repo for related open issues. "
-        "Correlate the findings."
-    )
-
-    print(result.text)
+        options=options,
+    ):
+        if isinstance(message, AssistantMessage):
+            for block in message.content:
+                if isinstance(block, TextBlock):
+                    print(block.text)
+        elif isinstance(message, ResultMessage):
+            print(f"Session: {message.session_id}")
 
 
 if __name__ == "__main__":
