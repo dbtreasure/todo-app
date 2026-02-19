@@ -9,9 +9,32 @@ Usage:
     uv run agent-sdk/python/read_only_then_write.py
 """
 
+import sys
 import asyncio
 
-from claude_code_sdk import ClaudeCodeAgent, AgentConfig
+from claude_agent_sdk import (
+    query,
+    ClaudeAgentOptions,
+    AssistantMessage,
+    ResultMessage,
+    TextBlock,
+)
+
+if sys.platform == "win32":
+    asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
+
+
+async def _collect_text(prompt: str, options: ClaudeAgentOptions) -> str:
+    """Run a query and collect all text blocks into a single string."""
+    parts: list[str] = []
+    async for message in query(prompt=prompt, options=options):
+        if isinstance(message, AssistantMessage):
+            for block in message.content:
+                if isinstance(block, TextBlock):
+                    parts.append(block.text)
+        elif isinstance(message, ResultMessage):
+            print(f"  Cost: ${message.cost_usd:.4f} | Duration: {message.duration_ms}ms")
+    return "\n".join(parts)
 
 
 async def analyze_then_refactor(target_path: str) -> dict:
@@ -19,51 +42,40 @@ async def analyze_then_refactor(target_path: str) -> dict:
 
     # Phase 1: Read-only analysis
     print(f"Phase 1: Analyzing {target_path}...")
-    analyzer = ClaudeCodeAgent(
-        config=AgentConfig(
-            model="sonnet",
-            permission_mode="read-only",
-            max_turns=10,
-            allowed_tools=["Read", "Grep", "Glob"],
-        ),
-        system_prompt=(
-            "You are a code analyzer. Read and analyze the specified code. "
-            "Identify specific issues: code smells, performance problems, "
-            "type safety gaps, and improvement opportunities. "
-            "Be precise with file paths and line numbers. "
-            "You CANNOT modify any files — only read and report."
-        ),
+    analyzer_options = ClaudeAgentOptions(
+        allowed_tools=["Read", "Grep", "Glob"],
+        permission_mode="bypassPermissions",
+        model="claude-sonnet-4-5",
     )
-
-    analysis_result = await analyzer.run(
+    analysis_prompt = (
+        "You are a code analyzer. Read and analyze the specified code. "
+        "Identify specific issues: code smells, performance problems, "
+        "type safety gaps, and improvement opportunities. "
+        "Be precise with file paths and line numbers. "
+        "You CANNOT modify any files -- only read and report.\n\n"
         f"Analyze the code at {target_path} and list all issues found."
     )
-    analysis = analysis_result.text
-    print(f"  Analysis complete: found issues")
+    analysis = await _collect_text(analysis_prompt, analyzer_options)
+    print(f"  Analysis complete: found issues ({len(analysis)} chars)")
 
-    # Phase 2: Write-capable refactoring
+    # Phase 2: Write-capable refactoring (passes analysis as context)
     print("Phase 2: Implementing fixes...")
-    refactorer = ClaudeCodeAgent(
-        config=AgentConfig(
-            model="sonnet",
-            permission_mode="workspace",
-            max_turns=15,
-            allowed_tools=["Read", "Edit", "Write", "Grep", "Glob"],
-        ),
-        system_prompt=(
-            "You are a refactoring agent. Given an analysis of code issues, "
-            "implement the recommended fixes. Make minimal, targeted changes. "
-            "Do not refactor beyond what the analysis recommends."
-        ),
+    refactorer_options = ClaudeAgentOptions(
+        allowed_tools=["Read", "Edit", "Write", "Grep", "Glob"],
+        permission_mode="acceptEdits",
+        model="claude-sonnet-4-5",
     )
-
-    refactor_result = await refactorer.run(
+    refactor_prompt = (
+        "You are a refactoring agent. Given an analysis of code issues, "
+        "implement the recommended fixes. Make minimal, targeted changes. "
+        "Do not refactor beyond what the analysis recommends.\n\n"
         f"Implement fixes for these issues:\n\n{analysis}"
     )
+    refactoring = await _collect_text(refactor_prompt, refactorer_options)
 
     return {
         "analysis": analysis,
-        "refactoring": refactor_result.text,
+        "refactoring": refactoring,
     }
 
 
