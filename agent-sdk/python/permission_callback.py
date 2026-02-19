@@ -76,6 +76,7 @@ async def permission_handler(
 
 async def main():
     options = ClaudeAgentOptions(
+        cwd="/tmp/work",
         can_use_tool=permission_handler,
         permission_mode="default",
         model="claude-sonnet-4-5",
@@ -87,7 +88,7 @@ async def main():
         "and fix them."
     )
 
-    async for message in query(prompt=prompt, options=options, cwd="/tmp/work"):
+    async for message in query(prompt=prompt, options=options):
         if isinstance(message, AssistantMessage):
             for block in message.content:
                 if isinstance(block, TextBlock):

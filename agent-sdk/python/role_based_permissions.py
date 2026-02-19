@@ -125,13 +125,14 @@ async def run_with_role(role_name: str, task: str):
     print(f"\n--- Running as '{role.name}' ---")
 
     options = ClaudeAgentOptions(
+        cwd="/tmp/work",
         can_use_tool=create_permission_handler(role),
         permission_mode="default",
         model="claude-sonnet-4-5",
         max_turns=5,
     )
 
-    async for message in query(prompt=task, options=options, cwd="/tmp/work"):
+    async for message in query(prompt=task, options=options):
         if isinstance(message, AssistantMessage):
             for block in message.content:
                 if isinstance(block, TextBlock):

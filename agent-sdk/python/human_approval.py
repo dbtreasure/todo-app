@@ -53,6 +53,7 @@ async def human_permission_handler(
 
 async def main():
     options = ClaudeAgentOptions(
+        cwd="/tmp/work",
         can_use_tool=human_permission_handler,
         permission_mode="default",
         model="claude-sonnet-4-5",
@@ -64,7 +65,7 @@ async def main():
         "and update the server actions to support it."
     )
 
-    async for message in query(prompt=prompt, options=options, cwd="/tmp/work"):
+    async for message in query(prompt=prompt, options=options):
         if isinstance(message, AssistantMessage):
             for block in message.content:
                 if isinstance(block, TextBlock):
