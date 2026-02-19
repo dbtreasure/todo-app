@@ -1,10 +1,9 @@
 """
-Agent with MCP -- Playwright Browser Automation
+Agent with MCP -- Single Connection
 
-Demonstrates configuring an external MCP server via dict config in
-ClaudeAgentOptions and using query() to run a prompt with MCP tools.
-
-No MCPConnection class -- just a plain dict in mcp_servers.
+Demonstrates connecting an agent to an MCP server via the mcp_servers
+dict config in ClaudeAgentOptions. The dict replaces any MCPConnection
+class -- just specify command, args, and optional env.
 
 Usage:
     uv run agent-sdk/python/agent_with_mcp.py
@@ -32,25 +31,24 @@ if sys.platform == "win32":
 async def main():
     options = ClaudeAgentOptions(
         mcp_servers={
-            "playwright": {
+            "postgres": {
                 "command": "npx",
-                "args": ["@playwright/mcp@latest"],
+                "args": [
+                    "-y",
+                    "@modelcontextprotocol/server-postgres",
+                    "postgresql://localhost:5432/todoDb",
+                ],
             },
         },
-        allowed_tools=[
-            "mcp__playwright__browser_navigate",
-            "mcp__playwright__browser_snapshot",
-            "mcp__playwright__browser_click",
-            "mcp__playwright__browser_type",
-        ],
         permission_mode="bypassPermissions",
         model="claude-sonnet-4-5",
+        max_turns=10,
     )
 
     async for message in query(
         prompt=(
-            "Navigate to https://news.ycombinator.com and take a snapshot. "
-            "List the top 5 stories currently on the front page."
+            "Query the database to list all tables and their schemas. "
+            "Then show me the 5 most recent todos."
         ),
         options=options,
     ):
@@ -59,7 +57,7 @@ async def main():
                 if isinstance(block, TextBlock):
                     print(block.text)
         elif isinstance(message, ResultMessage):
-            print(f"Session: {message.session_id}")
+            print(f"\nCost: ${message.total_cost_usd:.4f}")
 
 
 if __name__ == "__main__":

@@ -124,8 +124,8 @@ This branch is configured for **Video 17.8: MCP in the SDK** in the Claude Code 
 Using MCP servers from the Agent SDK — connecting to external services, managing multiple MCP connections.
 
 ### Files Added
-- `agent-sdk/python/agent_with_mcp.py` — Single MCPConnection + agent integration
-- `agent-sdk/python/multi_mcp_agent.py` — Multiple MCP connections
+- `agent-sdk/python/agent_with_mcp.py` — Single MCP connection via mcp_servers dict (Postgres)
+- `agent-sdk/python/multi_mcp_agent.py` — Multiple MCP connections via mcp_servers dict (Postgres + GitHub)
 - `agent-sdk/python/requirements.txt` — Python dependencies
 - `agent-sdk/python/.env.example` — API key template
 
