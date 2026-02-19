@@ -92,6 +92,7 @@ async def main():
             "by impact."
         ),
         options=options,
+        cwd="/tmp/work",
     ):
         if isinstance(message, AssistantMessage):
             for block in message.content:
