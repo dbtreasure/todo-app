@@ -1,125 +1,134 @@
 """
-API Integration Tools — Customer Data and Invoicing
+API Integration Tools -- Customer Data and Invoicing
 
-Demonstrates real-world custom tools that integrate with external APIs.
-Shows how to handle authentication, errors, and structured responses.
+Demonstrates real-world custom tools that integrate with external APIs
+using httpx. Shows two tools registered via @tool decorator, served
+through create_sdk_mcp_server, and invoked by ClaudeSDKClient.
 
 Usage:
     uv run agent-sdk/python/api_integration_tools.py
 """
 
 import asyncio
+import json
 import os
+import sys
 
 import httpx
 from dotenv import load_dotenv
 
-from claude_code_sdk import ClaudeCodeAgent, AgentConfig, Tool, ToolResult
+from claude_agent_sdk import (
+    AssistantMessage,
+    ClaudeAgentOptions,
+    ClaudeSDKClient,
+    ResultMessage,
+    TextBlock,
+    create_sdk_mcp_server,
+    tool,
+)
 
 load_dotenv()
 
+if sys.platform == "win32":
+    asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
 
-# Define tools
-get_customer_tool = Tool(
-    name="get_customer_data",
-    description="Look up customer information by ID. Returns name, email, plan, and account status.",
-    input_schema={
-        "type": "object",
-        "properties": {
-            "customer_id": {
-                "type": "string",
-                "description": "The unique customer identifier",
+API_BASE_URL = os.environ.get("BILLING_API_URL", "https://httpbin.org")
+API_KEY = os.environ.get("BILLING_API_KEY", "")
+
+
+@tool(
+    "get_customer_data",
+    "Look up customer information by ID. Returns name, email, plan, and account status.",
+    {"customer_id": str},
+)
+def get_customer_data(customer_id: str) -> dict:
+    """Fetch customer data from the billing API."""
+    headers = {"Authorization": f"Bearer {API_KEY}"} if API_KEY else {}
+
+    try:
+        with httpx.Client(timeout=10.0) as client:
+            response = client.get(
+                f"{API_BASE_URL}/anything/customers/{customer_id}",
+                headers=headers,
+            )
+            response.raise_for_status()
+            return {
+                "content": [{"type": "text", "text": response.text}]
             }
-        },
-        "required": ["customer_id"],
-    },
+    except httpx.HTTPStatusError as e:
+        return {
+            "content": [
+                {"type": "text", "text": f"API error {e.response.status_code}: {e.response.text}"}
+            ]
+        }
+    except httpx.RequestError as e:
+        return {
+            "content": [{"type": "text", "text": f"Connection error: {e}"}]
+        }
+
+
+@tool(
+    "create_invoice",
+    "Create a new invoice for a customer with line items. Returns the invoice ID and total.",
+    {"customer_id": str, "items": list},
 )
+def create_invoice(customer_id: str, items: list) -> dict:
+    """Create an invoice via the billing API."""
+    headers = {"Authorization": f"Bearer {API_KEY}"} if API_KEY else {}
 
-create_invoice_tool = Tool(
-    name="create_invoice",
-    description="Create a new invoice for a customer. Returns the invoice ID and total.",
-    input_schema={
-        "type": "object",
-        "properties": {
-            "customer_id": {
-                "type": "string",
-                "description": "The customer to invoice",
-            },
-            "items": {
-                "type": "array",
-                "description": "Line items for the invoice",
-                "items": {
-                    "type": "object",
-                    "properties": {
-                        "description": {"type": "string"},
-                        "quantity": {"type": "integer", "minimum": 1},
-                        "unit_price": {"type": "number", "minimum": 0},
-                    },
-                    "required": ["description", "quantity", "unit_price"],
-                },
-            },
-        },
-        "required": ["customer_id", "items"],
-    },
+    payload = {
+        "customer_id": customer_id,
+        "items": items,
+    }
+
+    try:
+        with httpx.Client(timeout=10.0) as client:
+            response = client.post(
+                f"{API_BASE_URL}/anything/invoices",
+                json=payload,
+                headers=headers,
+            )
+            response.raise_for_status()
+            return {
+                "content": [{"type": "text", "text": response.text}]
+            }
+    except httpx.HTTPStatusError as e:
+        return {
+            "content": [
+                {"type": "text", "text": f"API error {e.response.status_code}: {e.response.text}"}
+            ]
+        }
+    except httpx.RequestError as e:
+        return {
+            "content": [{"type": "text", "text": f"Connection error: {e}"}]
+        }
+
+
+server = create_sdk_mcp_server(
+    name="service", tools=[get_customer_data, create_invoice]
 )
-
-
-async def handle_tool(name: str, tool_input: dict) -> ToolResult:
-    """Route tool calls to their handlers."""
-    api_url = os.environ.get("BILLING_API_URL", "https://api.example.com")
-    api_key = os.environ.get("BILLING_API_KEY", "")
-
-    async with httpx.AsyncClient() as client:
-        headers = {"Authorization": f"Bearer {api_key}"} if api_key else {}
-
-        try:
-            if name == "get_customer_data":
-                response = await client.get(
-                    f"{api_url}/customers/{tool_input['customer_id']}",
-                    headers=headers,
-                    timeout=10.0,
-                )
-                response.raise_for_status()
-                return ToolResult(output=response.text)
-
-            elif name == "create_invoice":
-                response = await client.post(
-                    f"{api_url}/invoices",
-                    json=tool_input,
-                    headers=headers,
-                    timeout=10.0,
-                )
-                response.raise_for_status()
-                return ToolResult(output=response.text)
-
-            else:
-                return ToolResult(error=f"Unknown tool: {name}")
-
-        except httpx.HTTPStatusError as e:
-            return ToolResult(error=f"API error {e.response.status_code}: {e.response.text}")
-        except httpx.RequestError as e:
-            return ToolResult(error=f"Connection error: {e}")
 
 
 async def main():
-    agent = ClaudeCodeAgent(
-        config=AgentConfig(
-            model="sonnet",
-            permission_mode="read-only",
-            max_turns=10,
-        ),
-        custom_tools=[get_customer_tool, create_invoice_tool],
-        tool_handler=lambda name, input: asyncio.get_event_loop().run_until_complete(
-            handle_tool(name, input)
-        ),
+    options = ClaudeAgentOptions(
+        mcp_servers={"service": server},
+        allowed_tools=["mcp__service__get_customer_data", "mcp__service__create_invoice"],
+        permission_mode="bypassPermissions",
+        model="claude-sonnet-4-5",
     )
 
-    result = await agent.run(
+    client = ClaudeSDKClient(options)
+
+    async for message in client.process(
         "Look up customer CUST-001 and create an invoice for them with "
         "2 hours of consulting at $150/hr and 1 deployment setup at $500."
-    )
-
-    print(result.text)
+    ):
+        if isinstance(message, AssistantMessage):
+            for block in message.content:
+                if isinstance(block, TextBlock):
+                    print(block.text)
+        elif isinstance(message, ResultMessage):
+            print(f"Session: {message.session_id}")
 
 
 if __name__ == "__main__":
