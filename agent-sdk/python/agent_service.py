@@ -117,7 +117,7 @@ async def run_agent(request: AgentRequest):
         duration_ms = 0
         session_id = ""
 
-        async for message in query(prompt=request.prompt, options=options):
+        async for message in query(prompt=request.prompt, options=options, cwd="/tmp/work"):
             if isinstance(message, AssistantMessage):
                 for block in message.content:
                     if isinstance(block, TextBlock):
