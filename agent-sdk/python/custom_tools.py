@@ -74,6 +74,7 @@ async def main():
     script_path = os.path.abspath(__file__)
 
     options = ClaudeAgentOptions(
+        cwd="/tmp/work",
         mcp_servers={
             "math": {
                 "command": sys.executable,
@@ -91,7 +92,6 @@ async def main():
             "Then explain the growth rate of the Fibonacci sequence."
         ),
         options=options,
-        cwd="/tmp/work",
     ):
         if isinstance(message, AssistantMessage):
             for block in message.content:

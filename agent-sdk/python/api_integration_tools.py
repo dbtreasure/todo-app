@@ -104,6 +104,7 @@ async def main():
     script_path = os.path.abspath(__file__)
 
     options = ClaudeAgentOptions(
+        cwd="/tmp/work",
         mcp_servers={
             "service": {
                 "command": sys.executable,
@@ -124,7 +125,6 @@ async def main():
             "2 hours of consulting at $150/hr and 1 deployment setup at $500."
         ),
         options=options,
-        cwd="/tmp/work",
     ):
         if isinstance(message, AssistantMessage):
             for block in message.content:
