@@ -28,6 +28,7 @@ async function main() {
       "Read src/lib/actions.ts and explain what each server action does, " +
       "including its parameters and return type.",
     options,
+    cwd: "/tmp/work",
   });
 
   for await (const message of response) {
