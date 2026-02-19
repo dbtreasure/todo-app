@@ -2,7 +2,7 @@
 Role-Based Access Control (RBAC) Permissions
 
 Demonstrates configuring agent permissions based on user roles using
-dataclasses and the can_use_tool callback pattern.
+dataclasses and the PreToolUse hook pattern.
 
 Three tiers:
 - Viewer: read-only access (Read, Grep, Glob)
@@ -20,8 +20,7 @@ from dataclasses import dataclass, field
 from claude_agent_sdk import (
     AssistantMessage,
     ClaudeAgentOptions,
-    PermissionResultAllow,
-    PermissionResultDeny,
+    HookMatcher,
     ResultMessage,
     TextBlock,
     query,
@@ -69,17 +68,25 @@ ROLES: dict[str, Role] = {
 }
 
 
-def create_permission_handler(role: Role):
-    """Create a can_use_tool handler bound to a specific role's permissions."""
+def create_permission_hook(role: Role):
+    """Create a PreToolUse hook bound to a specific role's permissions."""
 
-    async def handler(
-        tool_name: str, tool_input: dict, context: dict
-    ) -> PermissionResultAllow | PermissionResultDeny:
+    async def hook(input_data, tool_use_id, context):
+        tool_name = input_data.get("tool_name", "")
+        tool_input = input_data.get("tool_input", {})
+
+        def deny(reason):
+            return {
+                "hookSpecificOutput": {
+                    "hookEventName": "PreToolUse",
+                    "permissionDecision": "deny",
+                    "permissionDecisionReason": reason,
+                }
+            }
+
         # Check tool allowlist
         if tool_name not in role.allowed_tools:
-            return PermissionResultDeny(
-                message=f"Role '{role.name}' cannot use tool '{tool_name}'"
-            )
+            return deny(f"Role '{role.name}' cannot use tool '{tool_name}'")
 
         # Check file path restrictions for file-based tools
         if tool_name in {"Read", "Edit", "Write"}:
@@ -88,35 +95,35 @@ def create_permission_handler(role: Role):
             # Check denied paths first
             for denied in role.denied_paths:
                 if denied and file_path.startswith(denied):
-                    return PermissionResultDeny(
-                        message=f"Role '{role.name}' denied access to '{file_path}'"
+                    return deny(
+                        f"Role '{role.name}' denied access to '{file_path}'"
                     )
 
             # Check allowed paths (empty string means all paths)
             if role.allowed_paths and "" not in role.allowed_paths:
                 if not any(
-                    file_path.startswith(prefix) for prefix in role.allowed_paths
+                    file_path.startswith(prefix)
+                    for prefix in role.allowed_paths
                 ):
-                    return PermissionResultDeny(
-                        message=(
-                            f"Role '{role.name}' can only access paths: "
-                            f"{', '.join(role.allowed_paths)}"
-                        )
+                    return deny(
+                        f"Role '{role.name}' can only access paths: "
+                        f"{', '.join(role.allowed_paths)}"
                     )
 
         # Check bash command restrictions
         if tool_name == "Bash" and role.allowed_bash_prefixes:
             command = tool_input.get("command", "")
             if not any(
-                command.startswith(prefix) for prefix in role.allowed_bash_prefixes
+                command.startswith(prefix)
+                for prefix in role.allowed_bash_prefixes
             ):
-                return PermissionResultDeny(
-                    message=f"Role '{role.name}' cannot run bash command: '{command}'"
+                return deny(
+                    f"Role '{role.name}' cannot run bash command: '{command}'"
                 )
 
-        return PermissionResultAllow(updated_input=tool_input)
+        return {}
 
-    return handler
+    return hook
 
 
 async def run_with_role(role_name: str, task: str):
@@ -126,10 +133,14 @@ async def run_with_role(role_name: str, task: str):
 
     options = ClaudeAgentOptions(
         cwd="/tmp/work",
-        can_use_tool=create_permission_handler(role),
         permission_mode="default",
         model="claude-sonnet-4-5",
         max_turns=5,
+        hooks={
+            "PreToolUse": [
+                HookMatcher(matcher=".*", hooks=[create_permission_hook(role)])
+            ]
+        },
     )
 
     async for message in query(prompt=task, options=options):

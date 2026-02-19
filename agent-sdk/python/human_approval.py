@@ -2,7 +2,7 @@
 Human-in-the-Loop Approval
 
 Prompts the user in the terminal to approve or deny each tool call.
-Uses the can_use_tool callback with input() for interactive approval.
+Uses a PreToolUse hook with input() for interactive approval.
 Useful for supervised agent operation where a human reviews every action.
 
 Usage:
@@ -16,8 +16,7 @@ import sys
 from claude_agent_sdk import (
     AssistantMessage,
     ClaudeAgentOptions,
-    PermissionResultAllow,
-    PermissionResultDeny,
+    HookMatcher,
     ResultMessage,
     TextBlock,
     query,
@@ -27,10 +26,10 @@ if sys.platform == "win32":
     asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
 
 
-async def human_permission_handler(
-    tool_name: str, tool_input: dict, context: dict
-) -> PermissionResultAllow | PermissionResultDeny:
+async def human_approval_hook(input_data, tool_use_id, context):
     """Ask the human operator to approve each tool call."""
+    tool_name = input_data.get("tool_name", "")
+    tool_input = input_data.get("tool_input", {})
 
     separator = "=" * 60
     print(f"\n{separator}")
@@ -43,21 +42,31 @@ async def human_permission_handler(
     while True:
         response = input("Allow this tool call? (y/n): ").strip().lower()
         if response in ("y", "yes"):
-            return PermissionResultAllow(updated_input=tool_input)
+            return {}
         if response in ("n", "no"):
-            return PermissionResultDeny(
-                message=f"Human operator denied {tool_name}"
-            )
+            return {
+                "hookSpecificOutput": {
+                    "hookEventName": "PreToolUse",
+                    "permissionDecision": "deny",
+                    "permissionDecisionReason": (
+                        f"Human operator denied {tool_name}"
+                    ),
+                }
+            }
         print("Please enter 'y' or 'n'.")
 
 
 async def main():
     options = ClaudeAgentOptions(
         cwd="/tmp/work",
-        can_use_tool=human_permission_handler,
         permission_mode="default",
         model="claude-sonnet-4-5",
         max_turns=10,
+        hooks={
+            "PreToolUse": [
+                HookMatcher(matcher=".*", hooks=[human_approval_hook])
+            ]
+        },
     )
 
     prompt = (

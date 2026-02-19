@@ -1,10 +1,9 @@
 """
 Permission Callback — Programmatic Tool Approval
 
-Demonstrates programmatic permission handling using the can_use_tool
-callback in ClaudeAgentOptions. The handler receives tool_name,
-tool_input, and context, and returns PermissionResultAllow or
-PermissionResultDeny.
+Demonstrates programmatic permission handling using PreToolUse hooks
+in ClaudeAgentOptions. The hook receives input_data with tool_name
+and tool_input, and returns a permission decision.
 
 Rules implemented:
 - Always allow read-only tools (Read, Grep, Glob)
@@ -22,8 +21,7 @@ import sys
 from claude_agent_sdk import (
     AssistantMessage,
     ClaudeAgentOptions,
-    PermissionResultAllow,
-    PermissionResultDeny,
+    HookMatcher,
     ResultMessage,
     TextBlock,
     query,
@@ -43,44 +41,66 @@ ALLOWED_WRITE_PATHS = ("src/", "tests/")
 SAFE_BASH_PREFIXES = ("npm test", "npm run lint", "npx tsc")
 
 
-async def permission_handler(
-    tool_name: str, tool_input: dict, context: dict
-) -> PermissionResultAllow | PermissionResultDeny:
+async def permission_hook(input_data, tool_use_id, context):
     """Decide whether to allow a tool call based on predefined rules."""
+    tool_name = input_data.get("tool_name", "")
+    tool_input = input_data.get("tool_input", {})
 
     # Always allow read-only tools
     if tool_name in READONLY_TOOLS:
-        return PermissionResultAllow(updated_input=tool_input)
+        return {}
 
     # Allow write tools only in permitted paths
     if tool_name in WRITE_TOOLS:
         file_path = tool_input.get("file_path", "")
         if any(file_path.startswith(prefix) for prefix in ALLOWED_WRITE_PATHS):
-            return PermissionResultAllow(updated_input=tool_input)
-        return PermissionResultDeny(
-            message=f"Write access denied: {file_path} is not in an allowed path"
-        )
+            return {}
+        return {
+            "hookSpecificOutput": {
+                "hookEventName": "PreToolUse",
+                "permissionDecision": "deny",
+                "permissionDecisionReason": (
+                    f"Write access denied: {file_path} is not in an allowed path"
+                ),
+            }
+        }
 
     # Allow Bash only for safe commands
     if tool_name == "Bash":
         command = tool_input.get("command", "")
         if any(command.startswith(prefix) for prefix in SAFE_BASH_PREFIXES):
-            return PermissionResultAllow(updated_input=tool_input)
-        return PermissionResultDeny(
-            message=f"Bash command denied: '{command}' is not in the safe list"
-        )
+            return {}
+        return {
+            "hookSpecificOutput": {
+                "hookEventName": "PreToolUse",
+                "permissionDecision": "deny",
+                "permissionDecisionReason": (
+                    f"Bash command denied: '{command}' is not in the safe list"
+                ),
+            }
+        }
 
     # Deny everything else
-    return PermissionResultDeny(message=f"Tool '{tool_name}' is not permitted")
+    return {
+        "hookSpecificOutput": {
+            "hookEventName": "PreToolUse",
+            "permissionDecision": "deny",
+            "permissionDecisionReason": f"Tool '{tool_name}' is not permitted",
+        }
+    }
 
 
 async def main():
     options = ClaudeAgentOptions(
         cwd="/tmp/work",
-        can_use_tool=permission_handler,
         permission_mode="default",
         model="claude-sonnet-4-5",
         max_turns=10,
+        hooks={
+            "PreToolUse": [
+                HookMatcher(matcher=".*", hooks=[permission_hook])
+            ]
+        },
     )
 
     prompt = (
