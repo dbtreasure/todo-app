@@ -28,7 +28,7 @@ if sys.platform == "win32":
 async def _collect_text(prompt: str, options: ClaudeAgentOptions) -> str:
     """Run a query and collect all text blocks into a single string."""
     parts: list[str] = []
-    async for message in query(prompt=prompt, options=options):
+    async for message in query(prompt=prompt, options=options, cwd="/tmp/work"):
         if isinstance(message, AssistantMessage):
             for block in message.content:
                 if isinstance(block, TextBlock):
