@@ -4,7 +4,7 @@ Session Workflow — Multi-Step Task Persistence
 Demonstrates creating a session, doing work across multiple interactions,
 and resuming the session later. The session_id is captured from the
 ResultMessage of the first query() call, saved to a JSON file using
-pathlib, and then passed via ClaudeAgentOptions(resume=session_id)
+pathlib, and then passed via ClaudeAgentOptions(session_id=session_id)
 in subsequent calls so the agent retains context between runs.
 
 Usage:
@@ -58,7 +58,7 @@ async def run_query(prompt: str, session_id: str | None = None) -> str | None:
     # If we have a previous session_id, resume it
     if session_id is not None:
         options = ClaudeAgentOptions(
-            resume=session_id,
+            session_id=session_id,
             permission_mode="bypassPermissions",
             model="claude-sonnet-4-5",
             max_turns=5,
@@ -73,7 +73,7 @@ async def run_query(prompt: str, session_id: str | None = None) -> str | None:
                     print(block.text, end="", flush=True)
         elif isinstance(message, ResultMessage):
             captured_session_id = message.session_id
-            print(f"\n\nCost: ${message.cost_usd:.4f}")
+            print(f"\n\nCost: ${message.total_cost_usd:.4f}")
             print(f"Duration: {message.duration_ms}ms")
 
     return captured_session_id

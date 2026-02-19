@@ -5,7 +5,7 @@ Demonstrates the session lifecycle using the real claude_agent_sdk API:
 1. Run an initial query and capture session_id from ResultMessage
 2. Store session info in a JSON file using pathlib
 3. List saved sessions from the JSON store
-4. Resume a session with ClaudeAgentOptions(resume=session_id)
+4. Resume a session with ClaudeAgentOptions(session_id=session_id)
 5. Fork a session with fork_session=True for branching workflows
 
 No fictional SessionManager class — all session tracking is done via
@@ -89,11 +89,11 @@ async def run_and_capture(prompt: str, options: ClaudeAgentOptions) -> dict | No
         elif isinstance(message, ResultMessage):
             result_info = {
                 "session_id": message.session_id,
-                "cost_usd": message.cost_usd,
+                "total_cost_usd": message.total_cost_usd,
                 "duration_ms": message.duration_ms,
             }
             print(f"\n  Session ID: {message.session_id}")
-            print(f"  Cost: ${message.cost_usd:.4f}")
+            print(f"  Cost: ${message.total_cost_usd:.4f}")
             print(f"  Duration: {message.duration_ms}ms")
 
     return result_info
@@ -125,7 +125,7 @@ async def main():
     add_session(
         session_id=session_id,
         description="Initial project overview",
-        cost_usd=result["cost_usd"],
+        cost_usd=result["total_cost_usd"],
         duration_ms=result["duration_ms"],
     )
     print(f"\n  Session saved to {SESSIONS_FILE}")
@@ -133,7 +133,7 @@ async def main():
     # Step 3: Resume the session to ask a follow-up question
     print("\n=== Resuming Session ===")
     resume_options = ClaudeAgentOptions(
-        resume=session_id,
+        session_id=session_id,
         permission_mode="bypassPermissions",
         model="claude-sonnet-4-5",
         max_turns=3,
@@ -148,14 +148,14 @@ async def main():
         add_session(
             session_id=resume_result["session_id"],
             description="Follow-up: identify main entry point",
-            cost_usd=resume_result["cost_usd"],
+            cost_usd=resume_result["total_cost_usd"],
             duration_ms=resume_result["duration_ms"],
         )
 
     # Step 4: Fork the session to explore a different direction
     print("\n=== Forking Session ===")
     fork_options = ClaudeAgentOptions(
-        resume=session_id,
+        session_id=session_id,
         fork_session=True,
         permission_mode="bypassPermissions",
         model="claude-sonnet-4-5",
@@ -174,7 +174,7 @@ async def main():
         add_session(
             session_id=fork_result["session_id"],
             description="Forked: explore data models",
-            cost_usd=fork_result["cost_usd"],
+            cost_usd=fork_result["total_cost_usd"],
             duration_ms=fork_result["duration_ms"],
         )
 
