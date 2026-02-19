@@ -2,29 +2,31 @@
 API Integration Tools -- Customer Data and Invoicing
 
 Demonstrates real-world custom tools that integrate with external APIs
-using httpx. Shows two tools registered via @tool decorator, served
-through create_sdk_mcp_server, and invoked by ClaudeSDKClient.
+using httpx. Two tools are registered in a FastMCP server, served as a
+subprocess via mcp_servers in ClaudeAgentOptions, and invoked through
+the SDK's query() function.
 
 Usage:
-    uv run agent-sdk/python/api_integration_tools.py
+    cd /tmp/work
+    uv venv /tmp/py-env && source /tmp/py-env/bin/activate
+    uv pip install claude-agent-sdk mcp python-dotenv httpx
+    python3 agent-sdk/python/api_integration_tools.py
 """
 
 import asyncio
-import json
 import os
 import sys
 
 import httpx
 from dotenv import load_dotenv
+from mcp.server.fastmcp import FastMCP
 
 from claude_agent_sdk import (
     AssistantMessage,
     ClaudeAgentOptions,
-    ClaudeSDKClient,
     ResultMessage,
     TextBlock,
-    create_sdk_mcp_server,
-    tool,
+    query,
 )
 
 load_dotenv()
@@ -36,12 +38,18 @@ API_BASE_URL = os.environ.get("BILLING_API_URL", "https://httpbin.org")
 API_KEY = os.environ.get("BILLING_API_KEY", "")
 
 
-@tool(
-    "get_customer_data",
-    "Look up customer information by ID. Returns name, email, plan, and account status.",
-    {"customer_id": str},
+# ---------------------------------------------------------------------------
+# 1. Build an MCP server with two API-backed tools
+# ---------------------------------------------------------------------------
+
+mcp = FastMCP("service")
+
+
+@mcp.tool(
+    name="get_customer_data",
+    description="Look up customer information by ID. Returns name, email, plan, and account status.",
 )
-def get_customer_data(customer_id: str) -> dict:
+def get_customer_data(customer_id: str) -> str:
     """Fetch customer data from the billing API."""
     headers = {"Authorization": f"Bearer {API_KEY}"} if API_KEY else {}
 
@@ -52,27 +60,18 @@ def get_customer_data(customer_id: str) -> dict:
                 headers=headers,
             )
             response.raise_for_status()
-            return {
-                "content": [{"type": "text", "text": response.text}]
-            }
+            return response.text
     except httpx.HTTPStatusError as e:
-        return {
-            "content": [
-                {"type": "text", "text": f"API error {e.response.status_code}: {e.response.text}"}
-            ]
-        }
+        return f"API error {e.response.status_code}: {e.response.text}"
     except httpx.RequestError as e:
-        return {
-            "content": [{"type": "text", "text": f"Connection error: {e}"}]
-        }
+        return f"Connection error: {e}"
 
 
-@tool(
-    "create_invoice",
-    "Create a new invoice for a customer with line items. Returns the invoice ID and total.",
-    {"customer_id": str, "items": list},
+@mcp.tool(
+    name="create_invoice",
+    description="Create a new invoice for a customer with line items. Returns the invoice ID and total.",
 )
-def create_invoice(customer_id: str, items: list) -> dict:
+def create_invoice(customer_id: str, items: list) -> str:
     """Create an invoice via the billing API."""
     headers = {"Authorization": f"Bearer {API_KEY}"} if API_KEY else {}
 
@@ -89,46 +88,49 @@ def create_invoice(customer_id: str, items: list) -> dict:
                 headers=headers,
             )
             response.raise_for_status()
-            return {
-                "content": [{"type": "text", "text": response.text}]
-            }
+            return response.text
     except httpx.HTTPStatusError as e:
-        return {
-            "content": [
-                {"type": "text", "text": f"API error {e.response.status_code}: {e.response.text}"}
-            ]
-        }
+        return f"API error {e.response.status_code}: {e.response.text}"
     except httpx.RequestError as e:
-        return {
-            "content": [{"type": "text", "text": f"Connection error: {e}"}]
-        }
+        return f"Connection error: {e}"
 
 
-server = create_sdk_mcp_server(
-    name="service", tools=[get_customer_data, create_invoice]
-)
+# ---------------------------------------------------------------------------
+# 2. Use the SDK to run a prompt with the custom tools
+# ---------------------------------------------------------------------------
 
 
 async def main():
+    script_path = os.path.abspath(__file__)
+
     options = ClaudeAgentOptions(
-        mcp_servers={"service": server},
-        allowed_tools=["mcp__service__get_customer_data", "mcp__service__create_invoice"],
+        mcp_servers={
+            "service": {
+                "command": sys.executable,
+                "args": ["-m", "mcp.server.fastmcp", "run", script_path],
+            },
+        },
+        allowed_tools=[
+            "mcp__service__get_customer_data",
+            "mcp__service__create_invoice",
+        ],
         permission_mode="bypassPermissions",
         model="claude-sonnet-4-5",
     )
 
-    client = ClaudeSDKClient(options)
-
-    async for message in client.process(
-        "Look up customer CUST-001 and create an invoice for them with "
-        "2 hours of consulting at $150/hr and 1 deployment setup at $500."
+    async for message in query(
+        prompt=(
+            "Look up customer CUST-001 and create an invoice for them with "
+            "2 hours of consulting at $150/hr and 1 deployment setup at $500."
+        ),
+        options=options,
     ):
         if isinstance(message, AssistantMessage):
             for block in message.content:
                 if isinstance(block, TextBlock):
                     print(block.text)
         elif isinstance(message, ResultMessage):
-            print(f"Session: {message.session_id}")
+            print(f"\nSession: {message.session_id}")
 
 
 if __name__ == "__main__":
