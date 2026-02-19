@@ -1,45 +1,57 @@
 """
 Streaming Output — Real-time Agent Responses
 
-Demonstrates streaming agent output as it's generated,
-handling different event types (text, tool_use, tool_result).
+Demonstrates streaming agent output as it's generated using the
+claude_agent_sdk query() async iterator. Messages arrive as
+AssistantMessage (with TextBlock content) and ResultMessage (with
+cost, duration, and session info) as the agent works.
 
 Usage:
     uv run agent-sdk/python/streaming_output.py
 """
 
 import asyncio
+import sys
+from pathlib import Path
 
-from dotenv import load_dotenv
+from claude_agent_sdk import (
+    AssistantMessage,
+    ClaudeAgentOptions,
+    ResultMessage,
+    TextBlock,
+    query,
+)
 
-from claude_code_sdk import ClaudeCodeAgent, AgentConfig
-
-load_dotenv()
+if sys.platform == "win32":
+    asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
 
 
 async def main():
-    agent = ClaudeCodeAgent(
-        config=AgentConfig(
-            model="sonnet",
-            permission_mode="read-only",
-            max_turns=5,
-        ),
+    """Stream agent output in real time, printing text blocks as they arrive."""
+
+    options = ClaudeAgentOptions(
+        permission_mode="bypassPermissions",
+        model="claude-sonnet-4-5",
+        max_turns=5,
+    )
+
+    prompt = (
+        "Analyze the project structure by reading package.json and "
+        "the files in src/. Describe the architecture."
     )
 
     print("Streaming agent response...\n")
 
-    async for event in agent.run_streaming(
-        "Analyze the project structure by reading package.json and "
-        "the files in src/. Describe the architecture."
-    ):
-        if event.type == "text":
-            print(event.text, end="", flush=True)
-        elif event.type == "tool_use":
-            print(f"\n[Tool: {event.tool_name}({event.tool_input})]")
-        elif event.type == "tool_result":
-            print(f"[Tool result: {len(str(event.output))} chars]")
-        elif event.type == "done":
-            print(f"\n\nDone. Tokens: {event.usage.input_tokens} in, {event.usage.output_tokens} out")
+    async for message in query(prompt=prompt, options=options):
+        if isinstance(message, AssistantMessage):
+            for block in message.content:
+                if isinstance(block, TextBlock):
+                    print(block.text, end="", flush=True)
+        elif isinstance(message, ResultMessage):
+            print(f"\n\nDone.")
+            print(f"Cost: ${message.cost_usd:.4f}")
+            print(f"Duration: {message.duration_ms}ms")
+            print(f"Session ID: {message.session_id}")
 
 
 if __name__ == "__main__":
