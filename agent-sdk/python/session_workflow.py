@@ -50,6 +50,7 @@ def load_session() -> dict | None:
 async def run_query(prompt: str, session_id: str | None = None) -> str | None:
     """Run a query, optionally resuming a session. Returns the session_id."""
     options = ClaudeAgentOptions(
+        cwd="/tmp/work",
         permission_mode="bypassPermissions",
         model="claude-sonnet-4-5",
         max_turns=5,
@@ -58,6 +59,7 @@ async def run_query(prompt: str, session_id: str | None = None) -> str | None:
     # If we have a previous session_id, resume it
     if session_id is not None:
         options = ClaudeAgentOptions(
+            cwd="/tmp/work",
             session_id=session_id,
             permission_mode="bypassPermissions",
             model="claude-sonnet-4-5",
@@ -66,7 +68,7 @@ async def run_query(prompt: str, session_id: str | None = None) -> str | None:
 
     captured_session_id: str | None = None
 
-    async for message in query(prompt=prompt, options=options, cwd="/tmp/work"):
+    async for message in query(prompt=prompt, options=options):
         if isinstance(message, AssistantMessage):
             for block in message.content:
                 if isinstance(block, TextBlock):

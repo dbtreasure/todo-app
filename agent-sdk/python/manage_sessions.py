@@ -81,7 +81,7 @@ async def run_and_capture(prompt: str, options: ClaudeAgentOptions) -> dict | No
     """Run a query, print output, and return result metadata."""
     result_info: dict | None = None
 
-    async for message in query(prompt=prompt, options=options, cwd="/tmp/work"):
+    async for message in query(prompt=prompt, options=options):
         if isinstance(message, AssistantMessage):
             for block in message.content:
                 if isinstance(block, TextBlock):
@@ -107,6 +107,7 @@ async def main():
     # Step 2: Create a new session with an initial query
     print("\n=== Creating New Session ===")
     options = ClaudeAgentOptions(
+        cwd="/tmp/work",
         permission_mode="bypassPermissions",
         model="claude-sonnet-4-5",
         max_turns=3,
@@ -133,6 +134,7 @@ async def main():
     # Step 3: Resume the session to ask a follow-up question
     print("\n=== Resuming Session ===")
     resume_options = ClaudeAgentOptions(
+        cwd="/tmp/work",
         session_id=session_id,
         permission_mode="bypassPermissions",
         model="claude-sonnet-4-5",
@@ -155,6 +157,7 @@ async def main():
     # Step 4: Fork the session to explore a different direction
     print("\n=== Forking Session ===")
     fork_options = ClaudeAgentOptions(
+        cwd="/tmp/work",
         session_id=session_id,
         fork_session=True,
         permission_mode="bypassPermissions",
