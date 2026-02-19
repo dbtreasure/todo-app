@@ -58,7 +58,7 @@ async def main():
                 if isinstance(block, TextBlock):
                     print(block.text)
         elif isinstance(message, ResultMessage):
-            print(f"Cost: ${message.cost_usd:.4f}")
+            print(f"Cost: ${message.total_cost_usd:.4f}")
 ```
 
 ## TypeScript Usage
@@ -74,13 +74,13 @@ const options: Options = {
 const response = query({ prompt: "Your task here", options });
 for await (const message of response) {
   if (message.type === "assistant") {
-    for (const block of message.content) {
+    for (const block of message.message.content) {
       if (block.type === "text") {
         console.log(block.text);
       }
     }
   } else if (message.type === "result") {
-    console.log(`Cost: $${message.costUsd.toFixed(4)}`);
+    console.log(`Cost: $${message.total_cost_usd.toFixed(4)}`);
   }
 }
 ```
