@@ -27,6 +27,7 @@ async function main() {
     prompt:
       "List all TypeScript files in src/ and summarize the project structure.",
     options,
+    cwd: "/tmp/work",
   });
 
   for await (const message of response) {
