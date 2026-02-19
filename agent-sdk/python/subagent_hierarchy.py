@@ -38,6 +38,7 @@ if sys.platform == "win32":
 
 async def main():
     options = ClaudeAgentOptions(
+        cwd="/tmp/work",
         agents={
             "security_reviewer": AgentDefinition(
                 description="Reviews code for security vulnerabilities",
@@ -92,7 +93,6 @@ async def main():
             "by impact."
         ),
         options=options,
-        cwd="/tmp/work",
     ):
         if isinstance(message, AssistantMessage):
             for block in message.content:
