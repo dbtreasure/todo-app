@@ -28,7 +28,7 @@ if sys.platform == "win32":
 async def _collect_text(prompt: str, options: ClaudeAgentOptions) -> str:
     """Run a query and collect all text blocks into a single string."""
     parts: list[str] = []
-    async for message in query(prompt=prompt, options=options, cwd="/tmp/work"):
+    async for message in query(prompt=prompt, options=options):
         if isinstance(message, AssistantMessage):
             for block in message.content:
                 if isinstance(block, TextBlock):
@@ -44,6 +44,7 @@ async def plan_review_execute(task: str) -> dict:
     # Phase 1: Plan (read-only analysis)
     print("Phase 1: Planning...")
     planner_options = ClaudeAgentOptions(
+        cwd="/tmp/work",
         permission_mode="plan",
         allowed_tools=["Read", "Grep", "Glob"],
         model="claude-sonnet-4-5",
@@ -60,6 +61,7 @@ async def plan_review_execute(task: str) -> dict:
     # Phase 2: Review (read-only analysis)
     print("Phase 2: Reviewing...")
     reviewer_options = ClaudeAgentOptions(
+        cwd="/tmp/work",
         permission_mode="plan",
         allowed_tools=["Read", "Grep", "Glob"],
         model="claude-sonnet-4-5",
@@ -77,6 +79,7 @@ async def plan_review_execute(task: str) -> dict:
     if "approve" in review.lower() or "approved" in review.lower():
         print("Phase 3: Executing approved plan...")
         executor_options = ClaudeAgentOptions(
+            cwd="/tmp/work",
             permission_mode="acceptEdits",
             allowed_tools=["Read", "Edit", "Write", "Grep", "Glob"],
             model="claude-sonnet-4-5",

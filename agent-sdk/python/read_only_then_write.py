@@ -27,7 +27,7 @@ if sys.platform == "win32":
 async def _collect_text(prompt: str, options: ClaudeAgentOptions) -> str:
     """Run a query and collect all text blocks into a single string."""
     parts: list[str] = []
-    async for message in query(prompt=prompt, options=options, cwd="/tmp/work"):
+    async for message in query(prompt=prompt, options=options):
         if isinstance(message, AssistantMessage):
             for block in message.content:
                 if isinstance(block, TextBlock):
@@ -43,6 +43,7 @@ async def analyze_then_refactor(target_path: str) -> dict:
     # Phase 1: Read-only analysis
     print(f"Phase 1: Analyzing {target_path}...")
     analyzer_options = ClaudeAgentOptions(
+        cwd="/tmp/work",
         allowed_tools=["Read", "Grep", "Glob"],
         permission_mode="bypassPermissions",
         model="claude-sonnet-4-5",
@@ -61,6 +62,7 @@ async def analyze_then_refactor(target_path: str) -> dict:
     # Phase 2: Write-capable refactoring (passes analysis as context)
     print("Phase 2: Implementing fixes...")
     refactorer_options = ClaudeAgentOptions(
+        cwd="/tmp/work",
         allowed_tools=["Read", "Edit", "Write", "Grep", "Glob"],
         permission_mode="acceptEdits",
         model="claude-sonnet-4-5",
