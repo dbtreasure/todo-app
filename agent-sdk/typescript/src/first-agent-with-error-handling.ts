@@ -21,6 +21,7 @@ async function main() {
 
   try {
     const options: Options = {
+      cwd: "/tmp/work",
       permissionMode: "bypassPermissions",
       model: "claude-sonnet-4-5",
       maxTurns: 5,
@@ -30,7 +31,6 @@ async function main() {
       prompt:
         "Read src/lib/actions.ts and explain what each server action does.",
       options,
-      cwd: "/tmp/work",
     });
 
     for await (const message of response) {

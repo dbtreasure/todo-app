@@ -18,6 +18,7 @@ import {
 
 async function main() {
   const options: Options = {
+    cwd: "/tmp/work",
     permissionMode: "bypassPermissions",
     model: "claude-sonnet-4-5",
     maxTurns: 5,
@@ -28,7 +29,6 @@ async function main() {
       "Read src/lib/actions.ts and explain what each server action does, " +
       "including its parameters and return type.",
     options,
-    cwd: "/tmp/work",
   });
 
   for await (const message of response) {
