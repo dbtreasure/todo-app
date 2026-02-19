@@ -81,7 +81,7 @@ async def run_and_capture(prompt: str, options: ClaudeAgentOptions) -> dict | No
     """Run a query, print output, and return result metadata."""
     result_info: dict | None = None
 
-    async for message in query(prompt=prompt, options=options):
+    async for message in query(prompt=prompt, options=options, cwd="/tmp/work"):
         if isinstance(message, AssistantMessage):
             for block in message.content:
                 if isinstance(block, TextBlock):

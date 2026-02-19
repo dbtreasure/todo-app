@@ -66,7 +66,7 @@ async def run_query(prompt: str, session_id: str | None = None) -> str | None:
 
     captured_session_id: str | None = None
 
-    async for message in query(prompt=prompt, options=options):
+    async for message in query(prompt=prompt, options=options, cwd="/tmp/work"):
         if isinstance(message, AssistantMessage):
             for block in message.content:
                 if isinstance(block, TextBlock):
