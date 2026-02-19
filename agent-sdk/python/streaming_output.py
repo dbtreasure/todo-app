@@ -42,7 +42,7 @@ async def main():
 
     print("Streaming agent response...\n")
 
-    async for message in query(prompt=prompt, options=options):
+    async for message in query(prompt=prompt, options=options, cwd="/tmp/work"):
         if isinstance(message, AssistantMessage):
             for block in message.content:
                 if isinstance(block, TextBlock):
