@@ -1,69 +1,100 @@
 """
-Permission Callback — Delegate Mode
+Permission Callback — Programmatic Tool Approval
 
-Demonstrates programmatic permission handling: the agent requests
-permission for tools, and a callback function decides based on rules.
+Demonstrates programmatic permission handling using the can_use_tool
+callback in ClaudeAgentOptions. The handler receives tool_name,
+tool_input, and context, and returns PermissionResultAllow or
+PermissionResultDeny.
+
+Rules implemented:
+- Always allow read-only tools (Read, Grep, Glob)
+- Allow Edit/Write only for paths under src/ or tests/
+- Allow Bash only for safe commands (npm test, npm run lint, npx tsc)
+- Deny everything else
 
 Usage:
     uv run agent-sdk/python/permission_callback.py
 """
 
 import asyncio
+import sys
 
-from dotenv import load_dotenv
+from claude_agent_sdk import (
+    AssistantMessage,
+    ClaudeAgentOptions,
+    PermissionResultAllow,
+    PermissionResultDeny,
+    ResultMessage,
+    TextBlock,
+    query,
+)
 
-from claude_code_sdk import ClaudeCodeAgent, AgentConfig, PermissionRequest
+if sys.platform == "win32":
+    asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
 
-load_dotenv()
-
-# Define read-only tools that are always allowed
+# Read-only tools that are always allowed
 READONLY_TOOLS = {"Read", "Grep", "Glob"}
 
-# Define tools that need explicit paths
+# Write tools restricted to specific path prefixes
 WRITE_TOOLS = {"Edit", "Write"}
-ALLOWED_WRITE_PATHS = {"src/", "tests/"}
+ALLOWED_WRITE_PATHS = ("src/", "tests/")
+
+# Bash commands allowed by prefix
+SAFE_BASH_PREFIXES = ("npm test", "npm run lint", "npx tsc")
 
 
-def permission_handler(request: PermissionRequest) -> bool:
-    """Decide whether to allow a tool call based on rules."""
-    tool = request.tool_name
+async def permission_handler(
+    tool_name: str, tool_input: dict, context: dict
+) -> PermissionResultAllow | PermissionResultDeny:
+    """Decide whether to allow a tool call based on predefined rules."""
 
     # Always allow read-only tools
-    if tool in READONLY_TOOLS:
-        return True
+    if tool_name in READONLY_TOOLS:
+        return PermissionResultAllow(updated_input=tool_input)
 
     # Allow write tools only in permitted paths
-    if tool in WRITE_TOOLS:
-        file_path = request.tool_input.get("file_path", "")
-        return any(file_path.startswith(prefix) for prefix in ALLOWED_WRITE_PATHS)
+    if tool_name in WRITE_TOOLS:
+        file_path = tool_input.get("file_path", "")
+        if any(file_path.startswith(prefix) for prefix in ALLOWED_WRITE_PATHS):
+            return PermissionResultAllow(updated_input=tool_input)
+        return PermissionResultDeny(
+            message=f"Write access denied: {file_path} is not in an allowed path"
+        )
 
-    # Block Bash by default in delegate mode
-    if tool == "Bash":
-        command = request.tool_input.get("command", "")
-        # Allow safe commands
-        safe_prefixes = ["npm test", "npm run lint", "npx tsc"]
-        return any(command.startswith(prefix) for prefix in safe_prefixes)
+    # Allow Bash only for safe commands
+    if tool_name == "Bash":
+        command = tool_input.get("command", "")
+        if any(command.startswith(prefix) for prefix in SAFE_BASH_PREFIXES):
+            return PermissionResultAllow(updated_input=tool_input)
+        return PermissionResultDeny(
+            message=f"Bash command denied: '{command}' is not in the safe list"
+        )
 
     # Deny everything else
-    return False
+    return PermissionResultDeny(message=f"Tool '{tool_name}' is not permitted")
 
 
 async def main():
-    agent = ClaudeCodeAgent(
-        config=AgentConfig(
-            model="sonnet",
-            permission_mode="delegate",
-            max_turns=10,
-        ),
-        permission_callback=permission_handler,
+    options = ClaudeAgentOptions(
+        can_use_tool=permission_handler,
+        permission_mode="default",
+        model="claude-sonnet-4-5",
+        max_turns=10,
     )
 
-    result = await agent.run(
+    prompt = (
         "Read the todo-list component, identify any TypeScript type issues, "
         "and fix them."
     )
 
-    print(result.text)
+    async for message in query(prompt=prompt, options=options):
+        if isinstance(message, AssistantMessage):
+            for block in message.content:
+                if isinstance(block, TextBlock):
+                    print(block.text, end="", flush=True)
+        elif isinstance(message, ResultMessage):
+            print(f"\n\nDone. Cost: ${message.cost_usd:.4f}")
+            print(f"Duration: {message.duration_ms}ms")
 
 
 if __name__ == "__main__":
