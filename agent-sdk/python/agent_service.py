@@ -1,7 +1,7 @@
 """
 Agent Service — FastAPI Wrapper
 
-Exposes the Claude Code Agent as an HTTP service with:
+Exposes the Claude Agent as an HTTP service with:
 - POST /agent/run — Run an agent task
 - GET /health — Health check endpoint
 - GET /metrics — Basic usage metrics
@@ -10,6 +10,7 @@ Usage:
     uv run agent-sdk/python/agent_service.py
 """
 
+import sys
 import asyncio
 import time
 from collections import defaultdict
@@ -19,25 +20,34 @@ from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel, Field
 
-from claude_code_sdk import ClaudeCodeAgent, AgentConfig
-from claude_code_sdk.exceptions import AgentError
+from claude_agent_sdk import (
+    query,
+    ClaudeAgentOptions,
+    AssistantMessage,
+    ResultMessage,
+    TextBlock,
+    ProcessError,
+)
+
+if sys.platform == "win32":
+    asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
 
 load_dotenv()
 
-# ── Metrics ───────────────────────────────────────────────────────
+# -- Metrics ---------------------------------------------------------------
 
-metrics = {
+metrics: dict = {
     "total_requests": 0,
     "successful_requests": 0,
     "failed_requests": 0,
-    "total_input_tokens": 0,
-    "total_output_tokens": 0,
+    "total_cost_usd": 0.0,
+    "total_duration_ms": 0,
     "requests_by_model": defaultdict(int),
 }
 start_time = time.time()
 
 
-# ── App Setup ─────────────────────────────────────────────────────
+# -- App Setup -------------------------------------------------------------
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -47,30 +57,32 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(
-    title="Claude Code Agent Service",
+    title="Claude Agent Service",
     version="1.0.0",
     lifespan=lifespan,
 )
 
 
-# ── Models ────────────────────────────────────────────────────────
+# -- Models ----------------------------------------------------------------
 
 class AgentRequest(BaseModel):
-    task: str = Field(..., min_length=1, max_length=10000, description="The task for the agent")
-    model: str = Field(default="sonnet", description="Model to use: haiku, sonnet, or opus")
-    max_turns: int = Field(default=10, ge=1, le=50, description="Maximum agent turns")
-    permission_mode: str = Field(default="read-only", description="Permission mode")
+    prompt: str = Field(
+        ..., min_length=1, max_length=10000, description="The prompt for the agent"
+    )
+    model: str = Field(
+        default="claude-sonnet-4-5", description="Model to use"
+    )
 
 
 class AgentResponse(BaseModel):
     text: str
-    input_tokens: int
-    output_tokens: int
+    cost_usd: float
+    duration_ms: int
+    session_id: str
     model: str
-    turns: int
 
 
-# ── Routes ────────────────────────────────────────────────────────
+# -- Routes ----------------------------------------------------------------
 
 @app.get("/health")
 async def health():
@@ -95,35 +107,46 @@ async def run_agent(request: AgentRequest):
     metrics["requests_by_model"][request.model] += 1
 
     try:
-        agent = ClaudeCodeAgent(
-            config=AgentConfig(
-                model=request.model,
-                permission_mode=request.permission_mode,
-                max_turns=request.max_turns,
-            ),
+        options = ClaudeAgentOptions(
+            permission_mode="bypassPermissions",
+            model=request.model,
         )
 
-        result = await agent.run(request.task)
+        collected_text: list[str] = []
+        cost_usd = 0.0
+        duration_ms = 0
+        session_id = ""
+
+        async for message in query(prompt=request.prompt, options=options):
+            if isinstance(message, AssistantMessage):
+                for block in message.content:
+                    if isinstance(block, TextBlock):
+                        collected_text.append(block.text)
+            elif isinstance(message, ResultMessage):
+                cost_usd = message.cost_usd
+                duration_ms = message.duration_ms
+                session_id = message.session_id
 
         metrics["successful_requests"] += 1
-        metrics["total_input_tokens"] += result.usage.input_tokens
-        metrics["total_output_tokens"] += result.usage.output_tokens
+        metrics["total_cost_usd"] += cost_usd
+        metrics["total_duration_ms"] += duration_ms
 
         return AgentResponse(
-            text=result.text,
-            input_tokens=result.usage.input_tokens,
-            output_tokens=result.usage.output_tokens,
+            text="\n".join(collected_text),
+            cost_usd=cost_usd,
+            duration_ms=duration_ms,
+            session_id=session_id,
             model=request.model,
-            turns=result.turns,
         )
 
-    except AgentError as e:
+    except ProcessError as e:
         metrics["failed_requests"] += 1
         raise HTTPException(status_code=500, detail=str(e))
 
 
-# ── Entry Point ───────────────────────────────────────────────────
+# -- Entry Point -----------------------------------------------------------
 
 if __name__ == "__main__":
     import uvicorn
+
     uvicorn.run(app, host="0.0.0.0", port=8000)

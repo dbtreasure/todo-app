@@ -5,6 +5,9 @@ WORKDIR /app
 # Install uv for fast dependency management
 RUN pip install uv
 
+# Install Claude Agent SDK
+RUN uv pip install --system claude-agent-sdk
+
 # Copy dependency files first for layer caching
 COPY python/requirements.txt .
 RUN uv pip install --system -r requirements.txt
