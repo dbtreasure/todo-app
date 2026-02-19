@@ -34,16 +34,16 @@ async function main() {
 
     for await (const message of response) {
       if (message.type === "assistant") {
-        for (const block of message.content) {
+        for (const block of message.message.content) {
           if (block.type === "text") {
             console.log(block.text);
           }
         }
       } else if (message.type === "result") {
         console.log(
-          `[INFO] Agent completed. Cost: $${message.costUsd.toFixed(4)}, Duration: ${message.durationMs}ms`
+          `[INFO] Agent completed. Cost: $${message.total_cost_usd.toFixed(4)}, Duration: ${message.duration_ms}ms`
         );
-        console.log(`[INFO] Session ID: ${message.sessionId}`);
+        console.log(`[INFO] Session ID: ${message.session_id}`);
       }
     }
   } catch (error) {
