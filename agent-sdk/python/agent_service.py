@@ -108,6 +108,7 @@ async def run_agent(request: AgentRequest):
 
     try:
         options = ClaudeAgentOptions(
+            cwd="/tmp/work",
             permission_mode="bypassPermissions",
             model=request.model,
         )
@@ -117,7 +118,7 @@ async def run_agent(request: AgentRequest):
         duration_ms = 0
         session_id = ""
 
-        async for message in query(prompt=request.prompt, options=options, cwd="/tmp/work"):
+        async for message in query(prompt=request.prompt, options=options):
             if isinstance(message, AssistantMessage):
                 for block in message.content:
                     if isinstance(block, TextBlock):
