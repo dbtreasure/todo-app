@@ -40,6 +40,7 @@ async def main():
             "including its parameters and return type."
         ),
         options=options,
+        cwd="/tmp/work",
     ):
         if isinstance(message, AssistantMessage):
             for block in message.content:

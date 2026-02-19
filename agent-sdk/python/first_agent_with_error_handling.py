@@ -51,6 +51,7 @@ async def main():
         async for message in query(
             prompt="Read src/lib/actions.ts and explain what each server action does.",
             options=options,
+            cwd="/tmp/work",
         ):
             if isinstance(message, AssistantMessage):
                 for block in message.content:
