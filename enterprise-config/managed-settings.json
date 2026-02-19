@@ -1,0 +1,30 @@
+{
+  "_comment": "Enterprise managed settings — deploy to developers via MDM or config management",
+  "_examples": {
+    "backend-engineer": "permissions.allow includes Read, Write, Edit, Bash, Grep, Glob",
+    "junior-developer": "permissions.allow limited to Read, Grep, Glob, Edit; Bash denied",
+    "ci-reviewer": "permissions.allow limited to Read, Grep, Glob only"
+  },
+  "permissions": {
+    "allow": [
+      "Read",
+      "Grep",
+      "Glob",
+      "Edit",
+      "Write",
+      "Bash"
+    ],
+    "deny": [
+      "Bash(command:rm -rf *)",
+      "Bash(command:*DROP TABLE*)",
+      "Write(file_path:*.env)",
+      "Write(file_path:*.key)",
+      "Write(file_path:*.pem)",
+      "Read(file_path:*.key)",
+      "Read(file_path:*.pem)"
+    ]
+  },
+  "env": {
+    "ANTHROPIC_MODEL": "claude-sonnet-4-5"
+  }
+}
