@@ -53,10 +53,14 @@
 
 ## OpenTelemetry Integration
 
-Claude Code exports telemetry via OTLP. Set the following environment variables:
+Claude Code exports metrics and logs via OTLP. Set the following environment variables:
 
 ```bash
-export OTEL_EXPORTER_OTLP_ENDPOINT=https://your-collector:4318
+export CLAUDE_CODE_ENABLE_TELEMETRY=1
+export OTEL_METRICS_EXPORTER=otlp
+export OTEL_LOGS_EXPORTER=otlp
+export OTEL_EXPORTER_OTLP_PROTOCOL=http/protobuf
+export OTEL_EXPORTER_OTLP_ENDPOINT=http://your-collector:4318
 export OTEL_EXPORTER_OTLP_HEADERS="Authorization=Bearer token"
 export OTEL_SERVICE_NAME=claude-code
 ```
