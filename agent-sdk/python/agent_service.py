@@ -123,7 +123,7 @@ async def run_agent(request: AgentRequest):
                     if isinstance(block, TextBlock):
                         collected_text.append(block.text)
             elif isinstance(message, ResultMessage):
-                cost_usd = message.cost_usd
+                cost_usd = message.total_cost_usd
                 duration_ms = message.duration_ms
                 session_id = message.session_id
 
