@@ -61,11 +61,11 @@ echo ""
 
 # Azure AI Foundry
 echo "── Azure AI Foundry ──"
-if [ -n "${ANTHROPIC_BASE_URL:-}" ] && echo "$ANTHROPIC_BASE_URL" | grep -q "azure"; then
-    check_var "ANTHROPIC_BASE_URL" "Azure"
-    check_var "ANTHROPIC_API_KEY" "Azure"
+if [ "${CLAUDE_CODE_USE_FOUNDRY:-}" = "1" ]; then
+    check_var "ANTHROPIC_FOUNDRY_BASE_URL" "Foundry"
+    check_var "ANTHROPIC_FOUNDRY_API_KEY" "Foundry"
 else
-    echo "  [SKIP] Azure not configured (ANTHROPIC_BASE_URL does not contain 'azure')"
+    echo "  [SKIP] CLAUDE_CODE_USE_FOUNDRY not set"
 fi
 echo ""
 
