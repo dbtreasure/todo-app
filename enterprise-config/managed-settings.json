@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "deny": [
+      "Bash(command:rm -rf *)",
+      "Bash(command:DROP TABLE*)"
+    ]
+  },
+  "env": {
+    "ANTHROPIC_MODEL": "claude-sonnet-4-5"
+  }
+}

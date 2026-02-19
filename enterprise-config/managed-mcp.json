@@ -1,39 +1,10 @@
 {
-  "$schema": "https://claude.ai/managed-mcp/v1",
-  "description": "Enterprise-wide Claude Code policy for Acme Corp",
-  "policies": {
-    "allowedModels": ["claude-sonnet-4-5-20250929", "claude-haiku-4-5-20251001"],
-    "deniedModels": ["claude-opus-4-6"],
-    "disableBypassPermissionsMode": true,
-    "maxTurnsPerSession": 50,
-    "requireApprovalForTools": ["Bash", "Write"],
-    "auditLogging": true
-  },
   "mcpServers": {
-    "github": {
-      "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-github"],
-      "env": {
-        "GITHUB_PERSONAL_ACCESS_TOKEN": "${GITHUB_TOKEN}"
-      },
-      "scope": "organization"
-    },
     "internal-docs": {
-      "command": "npx",
-      "args": ["-y", "internal-docs-mcp-server"],
+      "command": "node",
+      "args": ["internal-docs-mcp-server/dist/index.js"],
       "env": {
         "DOCS_API_KEY": "${DOCS_API_KEY}"
-      },
-      "scope": "organization"
-    }
-  },
-  "permissions": {
-    "defaultMode": "workspace",
-    "escalationRequired": ["system"],
-    "serviceAccounts": {
-      "ci-bot": {
-        "mode": "read-only",
-        "allowedTools": ["Read", "Grep", "Glob"]
       }
     }
   }
