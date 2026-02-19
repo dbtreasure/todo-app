@@ -59,7 +59,7 @@ async def main():
             elif isinstance(message, ResultMessage):
                 logger.info(
                     "Agent completed. Cost: $%.4f, Duration: %dms",
-                    message.cost_usd,
+                    message.total_cost_usd,
                     message.duration_ms,
                 )
 

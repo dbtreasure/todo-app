@@ -46,7 +46,7 @@ async def main():
                 if isinstance(block, TextBlock):
                     print(block.text)
         elif isinstance(message, ResultMessage):
-            print(f"\nCost: ${message.cost_usd:.4f}")
+            print(f"\nCost: ${message.total_cost_usd:.4f}")
             print(f"Duration: {message.duration_ms}ms")
 
 
