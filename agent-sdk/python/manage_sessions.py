@@ -1,12 +1,12 @@
 """
-Session Management — Capture, Store, List, Resume, and Fork Sessions
+Session Management — Capture, Store, List, and Resume Sessions
 
 Demonstrates the session lifecycle using the real claude_agent_sdk API:
 1. Run an initial query and capture session_id from ResultMessage
 2. Store session info in a JSON file using pathlib
 3. List saved sessions from the JSON store
-4. Resume a session with ClaudeAgentOptions(session_id=session_id)
-5. Fork a session with fork_session=True for branching workflows
+4. Resume a session with ClaudeAgentOptions(resume=session_id)
+5. Resume again to explore a different direction
 
 No fictional SessionManager class — all session tracking is done via
 a simple JSON file managed with pathlib.
@@ -135,7 +135,7 @@ async def main():
     print("\n=== Resuming Session ===")
     resume_options = ClaudeAgentOptions(
         cwd="/tmp/work",
-        session_id=session_id,
+        resume=session_id,
         permission_mode="bypassPermissions",
         model="claude-sonnet-4-5",
         max_turns=3,
@@ -154,31 +154,30 @@ async def main():
             duration_ms=resume_result["duration_ms"],
         )
 
-    # Step 4: Fork the session to explore a different direction
-    print("\n=== Forking Session ===")
-    fork_options = ClaudeAgentOptions(
+    # Step 4: Resume the session again to explore a different direction
+    print("\n=== Resuming Session (Different Direction) ===")
+    explore_options = ClaudeAgentOptions(
         cwd="/tmp/work",
-        session_id=session_id,
-        fork_session=True,
+        resume=session_id,
         permission_mode="bypassPermissions",
         model="claude-sonnet-4-5",
         max_turns=3,
     )
 
-    fork_result = await run_and_capture(
+    explore_result = await run_and_capture(
         prompt=(
             "Instead of the entry point, tell me about the data models "
             "and database layer from what you saw."
         ),
-        options=fork_options,
+        options=explore_options,
     )
 
-    if fork_result:
+    if explore_result:
         add_session(
-            session_id=fork_result["session_id"],
-            description="Forked: explore data models",
-            cost_usd=fork_result["total_cost_usd"],
-            duration_ms=fork_result["duration_ms"],
+            session_id=explore_result["session_id"],
+            description="Resumed: explore data models",
+            cost_usd=explore_result["total_cost_usd"],
+            duration_ms=explore_result["duration_ms"],
         )
 
     # Step 5: Show all sessions after the workflow
