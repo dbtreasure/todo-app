@@ -2,3 +2,4 @@
 /.next
 .env.local
 e2e/logs/
+e2e/.env

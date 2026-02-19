@@ -113,3 +113,143 @@ TypeScript path alias `@/*` maps to `./src/*`. Use `@/components/button` instead
 - **Dialog-based UX.** Create, edit, and delete operations all use Catalyst Dialog modals instead of navigating to separate pages.
 - **Server component data fetching.** The page fetches data on the server and passes it down. The client component only manages UI state (which dialog is open, which todo is selected).
 - **Todos are sorted newest-first** by `createdAt` descending.
+
+## Claude Agent SDK Demo Branches
+
+This repo doubles as the demo project for Stormwind Studios' Claude Agent SDK video series (Section 17 + 18.1). Each video has a dedicated branch containing SDK example code in `agent-sdk/python/` and/or `agent-sdk/typescript/`. The todo-app source code on `main` is the real codebase that the SDK agents analyze.
+
+### Branch List
+
+| Branch | Video | What It Demonstrates |
+|--------|-------|---------------------|
+| `17.1-agent-sdk-overview` | SDK Overview | Minimal `query()` call, Python + TypeScript side-by-side |
+| `17.2-python-sdk-setup` | Python Setup | First agent with error handling |
+| `17.3-typescript-sdk-setup` | TypeScript Setup | First agent with error handling (TS) |
+| `17.4-streaming-input-and-output` | Streaming | Real-time output iteration + large file input assembly |
+| `17.5-handling-permissions` | Permissions | Permission callbacks, human approval, role-based access |
+| `17.6-session-management` | Sessions | Session resumption, forking, multi-session workflows |
+| `17.7-custom-tools-in-the-sdk` | Custom Tools | FastMCP tool server + agent integration |
+| `17.8-mcp-in-the-sdk` | MCP Integration | Multiple MCP servers (Postgres, GitHub) |
+| `17.9-subagents-in-the-sdk` | Subagents | AgentDefinition for parallel code review |
+| `17.10-hosting-and-deployment` | Deployment | Production patterns, health checks, graceful shutdown |
+| `18.1-best-practices-for-effective-use` | Best Practices | Plan-review-execute + read-only-then-write patterns |
+
+### SDK Code Conventions
+
+All agent scripts across all branches follow these patterns:
+
+**`cwd` goes inside the options object, not on `query()`:**
+
+```python
+# Python — CORRECT
+options = ClaudeAgentOptions(
+    cwd="/tmp/work",            # MUST be inside options
+    model="claude-sonnet-4-5",
+    permission_mode="bypassPermissions",
+    max_turns=5,
+)
+async for message in query(prompt="...", options=options):
+    ...
+```
+
+```typescript
+// TypeScript — CORRECT
+const options: Options = {
+    cwd: "/tmp/work",           // MUST be inside options
+    permissionMode: "bypassPermissions",
+    model: "claude-sonnet-4-5",
+    maxTurns: 5,
+};
+const response = query({ prompt: "...", options });
+```
+
+**Result message fields use snake_case in both languages:**
+- `message.total_cost_usd` (not `cost_usd` or `costUsd`)
+- `message.duration_ms` (not `durationMs`)
+- `message.session_id` (not `sessionId`)
+
+**TypeScript assistant message content is nested:**
+- `message.message.content` (not `message.content`) — `SDKAssistantMessage` wraps `APIAssistantMessage`
+
+## E2E Test Infrastructure
+
+The `e2e/` directory contains a Docker-based testing environment for verifying SDK demo code before recording.
+
+### Directory Layout
+
+```
+e2e/
+  .devcontainer/
+    devcontainer.json       # VS Code Dev Container config
+  .env                      # ANTHROPIC_API_KEY (gitignored — create manually)
+  Dockerfile                # Ubuntu 24.04 + Node 22 + uv + Claude Code CLI
+  docker-compose.yml        # Automated test runner (mounts repo read-only at /repo)
+  docker-compose.interactive.yml  # Overrides for interactive dev container use
+  run-tests.sh              # Automated E2E test runner (T1/T2/T3 tiers)
+  setup-workspace.sh        # Interactive workspace setup (clones branch into /tmp/work)
+  format-log.py             # Formats Claude Code JSON logs for debugging
+  logs/                     # Claude Code session logs (gitignored)
+```
+
+### Test Tiers
+
+| Tier | What It Tests | Needs API Key? | Run Time |
+|------|--------------|----------------|----------|
+| **T1: Parse** | Python `ast.parse()`, TypeScript `tsc --noEmit` | No | ~5s |
+| **T2: Import** | `uv run python -c "from claude_agent_sdk import ..."`, `node -e "require(...)"` | No | ~15s |
+| **T3: Execute** | Actually run the agent scripts against the real Claude API | Yes | ~60s |
+
+### Running Automated Tests
+
+```bash
+# From the host machine (Mac or Windows with Docker):
+cd todo-app/e2e
+export ANTHROPIC_API_KEY=sk-ant-...
+
+# Run T2 (import check) on branch 17.1:
+BRANCH=17.1-agent-sdk-overview TIER=T2 docker compose up --build
+
+# Run T3 (full execution) on branch 17.4:
+BRANCH=17.4-streaming-input-and-output TIER=T3 docker compose up --build
+```
+
+### Interactive Dev Container (for recording demos)
+
+1. Open `todo-app/e2e` in VS Code
+2. VS Code prompts "Reopen in Container" — accept
+3. In the container terminal:
+
+```bash
+# Clone a specific branch into /tmp/work:
+BRANCH=17.3-typescript-sdk-setup bash /setup-workspace.sh
+
+# Set your API key:
+export ANTHROPIC_API_KEY=sk-ant-...
+
+# Follow the printed instructions to install deps and run scripts
+```
+
+The setup script:
+- Wipes and re-clones `/tmp/work` on every run (safe to re-run for branch switching)
+- Auto-opens `/tmp/work` in VS Code
+- Dynamically discovers Python/TypeScript files and prints correct run commands
+- Detects extra dependencies from `requirements.txt`
+
+### Environment
+
+The Docker image (Ubuntu 24.04) includes:
+- Node.js 22 LTS
+- Python 3 + uv
+- Claude Code CLI (`@anthropic-ai/claude-code`)
+- git, build-essential
+
+The entire todo-app repo is mounted read-only at `/repo`. The setup script clones from `/repo` into `/tmp/work` so you get a writable copy of whichever branch you need.
+
+### API Key Storage
+
+Create `e2e/.env` with your key:
+```
+ANTHROPIC_API_KEY=sk-ant-...
+```
+
+This file is **not** gitignored by default — add `e2e/.env` to `.gitignore` if you commit from this repo. The docker-compose.yml reads `ANTHROPIC_API_KEY` from the environment, and the `.env` file is auto-loaded by Docker Compose.
