@@ -1,7 +1,8 @@
 """
 First Agent with Error Handling
 
-Demonstrates proper error handling, logging, and graceful failure.
+Demonstrates proper error handling, logging, and graceful failure
+using the Claude Agent SDK.
 
 Usage:
     uv run agent-sdk/python/first_agent_with_error_handling.py
@@ -13,10 +14,22 @@ import sys
 
 from dotenv import load_dotenv
 
-from claude_code_sdk import ClaudeCodeAgent, AgentConfig
-from claude_code_sdk.exceptions import AgentError, AuthenticationError, RateLimitError
+from claude_agent_sdk import (
+    AssistantMessage,
+    CLIJSONDecodeError,
+    CLINotFoundError,
+    ClaudeAgentOptions,
+    ClaudeSDKError,
+    ProcessError,
+    ResultMessage,
+    TextBlock,
+    query,
+)
 
 load_dotenv()
+
+if sys.platform == "win32":
+    asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
 
 logging.basicConfig(
     level=logging.INFO,
@@ -29,33 +42,40 @@ async def main():
     logger.info("Starting agent...")
 
     try:
-        agent = ClaudeCodeAgent(
-            config=AgentConfig(
-                model="sonnet",
-                permission_mode="read-only",
-                max_turns=5,
-            ),
+        options = ClaudeAgentOptions(
+            permission_mode="bypassPermissions",
+            model="claude-sonnet-4-5",
+            max_turns=5,
         )
 
-        result = await agent.run(
-            "Read src/lib/actions.ts and explain what each server action does."
-        )
+        async for message in query(
+            prompt="Read src/lib/actions.ts and explain what each server action does.",
+            options=options,
+        ):
+            if isinstance(message, AssistantMessage):
+                for block in message.content:
+                    if isinstance(block, TextBlock):
+                        print(block.text)
+            elif isinstance(message, ResultMessage):
+                logger.info(
+                    "Agent completed. Cost: $%.4f, Duration: %dms",
+                    message.cost_usd,
+                    message.duration_ms,
+                )
 
-        logger.info(
-            "Agent completed. Tokens: %d in, %d out",
-            result.usage.input_tokens,
-            result.usage.output_tokens,
+    except CLINotFoundError:
+        logger.error(
+            "Claude CLI not found. Ensure it is installed and on your PATH."
         )
-        print(result.text)
-
-    except AuthenticationError:
-        logger.error("Authentication failed. Check your ANTHROPIC_API_KEY.")
         sys.exit(1)
-    except RateLimitError:
-        logger.error("Rate limited. Wait and try again.")
+    except ProcessError as e:
+        logger.error("Process error: %s", e)
         sys.exit(1)
-    except AgentError as e:
-        logger.error("Agent error: %s", e)
+    except CLIJSONDecodeError as e:
+        logger.error("Failed to decode CLI JSON output: %s", e)
+        sys.exit(1)
+    except ClaudeSDKError as e:
+        logger.error("SDK error: %s", e)
         sys.exit(1)
 
 
