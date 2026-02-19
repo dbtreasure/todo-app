@@ -1,4 +1,4 @@
-# Claude Code Agent SDK
+# Claude Agent SDK
 
 ## CLI vs SDK: When to Use Each
 
@@ -31,12 +31,56 @@ CI/CD pipeline?                       → CLI (headless) or SDK
 
 ### Python
 ```bash
-uv add claude-code-sdk python-dotenv
+uv add claude-agent-sdk python-dotenv
 ```
 
 ### TypeScript
 ```bash
-npm install @anthropic-ai/claude-code-sdk
+npm install @anthropic-ai/claude-agent-sdk
 ```
 
 Set `ANTHROPIC_API_KEY` in your environment or `.env` file.
+
+## Python Usage
+
+```python
+from claude_agent_sdk import query, ClaudeAgentOptions, AssistantMessage, TextBlock, ResultMessage
+
+async def main():
+    options = ClaudeAgentOptions(
+        permission_mode="bypassPermissions",
+        model="claude-sonnet-4-5",
+        max_turns=3,
+    )
+    async for message in query(prompt="Your task here", options=options):
+        if isinstance(message, AssistantMessage):
+            for block in message.content:
+                if isinstance(block, TextBlock):
+                    print(block.text)
+        elif isinstance(message, ResultMessage):
+            print(f"Cost: ${message.cost_usd:.4f}")
+```
+
+## TypeScript Usage
+
+```typescript
+import { query, type Options } from "@anthropic-ai/claude-agent-sdk";
+
+const options: Options = {
+  permissionMode: "bypassPermissions",
+  model: "claude-sonnet-4-5",
+  maxTurns: 3,
+};
+const response = query({ prompt: "Your task here", options });
+for await (const message of response) {
+  if (message.type === "assistant") {
+    for (const block of message.content) {
+      if (block.type === "text") {
+        console.log(block.text);
+      }
+    }
+  } else if (message.type === "result") {
+    console.log(`Cost: $${message.costUsd.toFixed(4)}`);
+  }
+}
+```

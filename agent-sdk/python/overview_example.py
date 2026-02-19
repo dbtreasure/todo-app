@@ -1,34 +1,48 @@
 """
-Minimal Claude Code Agent SDK Example (Python)
+Minimal Claude Agent SDK Example (Python)
 
-Demonstrates the simplest possible agent: create a session, send a message,
-and print the response.
+Demonstrates the simplest possible usage: send a prompt using query(),
+iterate over streamed messages, and print the response.
 
 Usage:
     uv run agent-sdk/python/overview_example.py
 """
 
 import asyncio
+import sys
 
-from claude_code_sdk import ClaudeCodeAgent, AgentConfig
+from claude_agent_sdk import (
+    AssistantMessage,
+    ClaudeAgentOptions,
+    ResultMessage,
+    TextBlock,
+    query,
+)
+
+if sys.platform == "win32":
+    asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
 
 
 async def main():
-    agent = ClaudeCodeAgent(
-        config=AgentConfig(
-            model="sonnet",
-            permission_mode="read-only",
-            max_turns=3,
-        ),
-    )
-
-    result = await agent.run(
-        "List all TypeScript files in src/ and summarize the project structure."
+    options = ClaudeAgentOptions(
+        permission_mode="bypassPermissions",
+        model="claude-sonnet-4-5",
+        max_turns=3,
     )
 
     print("Agent response:")
-    print(result.text)
-    print(f"\nTokens used: {result.usage.input_tokens} in, {result.usage.output_tokens} out")
+    async for message in query(
+        prompt="List all TypeScript files in src/ and summarize the project structure.",
+        options=options,
+    ):
+        if isinstance(message, AssistantMessage):
+            for block in message.content:
+                if isinstance(block, TextBlock):
+                    print(block.text)
+        elif isinstance(message, ResultMessage):
+            print(f"\nCost: ${message.cost_usd:.4f}")
+            print(f"Duration: {message.duration_ms}ms")
+            print(f"Session ID: {message.session_id}")
 
 
 if __name__ == "__main__":
