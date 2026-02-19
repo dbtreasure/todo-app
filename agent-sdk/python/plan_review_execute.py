@@ -45,7 +45,7 @@ async def plan_review_execute(task: str) -> dict:
     print("Phase 1: Planning...")
     planner_options = ClaudeAgentOptions(
         cwd="/tmp/work",
-        permission_mode="plan",
+        permission_mode="default",
         allowed_tools=["Read", "Grep", "Glob"],
         model="claude-sonnet-4-5",
     )
@@ -62,7 +62,7 @@ async def plan_review_execute(task: str) -> dict:
     print("Phase 2: Reviewing...")
     reviewer_options = ClaudeAgentOptions(
         cwd="/tmp/work",
-        permission_mode="plan",
+        permission_mode="default",
         allowed_tools=["Read", "Grep", "Glob"],
         model="claude-sonnet-4-5",
     )
