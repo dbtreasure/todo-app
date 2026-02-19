@@ -17,6 +17,7 @@ import {
 
 async function main() {
   const options: Options = {
+    cwd: "/tmp/work",
     permissionMode: "bypassPermissions",
     model: "claude-sonnet-4-5",
     maxTurns: 3,
@@ -27,7 +28,6 @@ async function main() {
     prompt:
       "List all TypeScript files in src/ and summarize the project structure.",
     options,
-    cwd: "/tmp/work",
   });
 
   for await (const message of response) {

@@ -25,6 +25,7 @@ if sys.platform == "win32":
 
 async def main():
     options = ClaudeAgentOptions(
+        cwd="/tmp/work",
         permission_mode="bypassPermissions",
         model="claude-sonnet-4-5",
         max_turns=3,
@@ -34,7 +35,6 @@ async def main():
     async for message in query(
         prompt="List all TypeScript files in src/ and summarize the project structure.",
         options=options,
-        cwd="/tmp/work",
     ):
         if isinstance(message, AssistantMessage):
             for block in message.content:
