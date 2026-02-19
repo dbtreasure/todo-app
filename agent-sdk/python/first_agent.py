@@ -29,6 +29,7 @@ if sys.platform == "win32":
 
 async def main():
     options = ClaudeAgentOptions(
+        cwd="/tmp/work",
         permission_mode="bypassPermissions",
         model="claude-sonnet-4-5",
         max_turns=5,
@@ -40,7 +41,6 @@ async def main():
             "including its parameters and return type."
         ),
         options=options,
-        cwd="/tmp/work",
     ):
         if isinstance(message, AssistantMessage):
             for block in message.content:
