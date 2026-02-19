@@ -51,6 +51,7 @@ async def analyze_large_input(file_paths: list[str]):
     print(f"Sending {len(combined)} chars from {len(chunks)} files for analysis...\n")
 
     options = ClaudeAgentOptions(
+        cwd="/tmp/work",
         permission_mode="bypassPermissions",
         model="claude-sonnet-4-5",
         max_turns=5,
@@ -61,7 +62,7 @@ async def analyze_large_input(file_paths: list[str]):
         f"potential bugs, and improvement opportunities:\n\n{combined}"
     )
 
-    async for message in query(prompt=prompt, options=options, cwd="/tmp/work"):
+    async for message in query(prompt=prompt, options=options):
         if isinstance(message, AssistantMessage):
             for block in message.content:
                 if isinstance(block, TextBlock):

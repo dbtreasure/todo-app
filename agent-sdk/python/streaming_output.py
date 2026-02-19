@@ -30,6 +30,7 @@ async def main():
     """Stream agent output in real time, printing text blocks as they arrive."""
 
     options = ClaudeAgentOptions(
+        cwd="/tmp/work",
         permission_mode="bypassPermissions",
         model="claude-sonnet-4-5",
         max_turns=5,
@@ -42,7 +43,7 @@ async def main():
 
     print("Streaming agent response...\n")
 
-    async for message in query(prompt=prompt, options=options, cwd="/tmp/work"):
+    async for message in query(prompt=prompt, options=options):
         if isinstance(message, AssistantMessage):
             for block in message.content:
                 if isinstance(block, TextBlock):
