@@ -123,10 +123,14 @@ This branch is configured for **Video 16.1: Database Connections** in the Claude
 ### Topic
 Connecting Claude Code to PostgreSQL and MySQL databases via MCP servers. Read-only access patterns and schema analysis.
 
+### Packages
+- **PostgreSQL:** `@modelcontextprotocol/server-postgres` -- deprecated upstream with a known SQL injection vulnerability, but acceptable for this teaching demo about configuration patterns. Do not use in production.
+- **MySQL:** `@benborla29/mcp-server-mysql` -- community MCP server for MySQL. Configured via environment variables.
+
 ### Files Added
 - `.claude/settings.json` — PostgreSQL and MySQL MCP server configurations
 - `scripts/setup-readonly-db-user.sql` — PostgreSQL read-only role setup
-- `.env.example` — Database connection strings
+- `.env.example` — Database connection strings and MySQL password
 
 ### Usage
 Set up a read-only database user with the SQL script, then configure connection strings in `.env`.

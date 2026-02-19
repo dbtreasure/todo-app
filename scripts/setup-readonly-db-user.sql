@@ -5,7 +5,7 @@
 CREATE ROLE claude_readonly WITH LOGIN PASSWORD 'change-this-password';
 
 -- Grant connect privilege
-GRANT CONNECT ON DATABASE todoDb TO claude_readonly;
+GRANT CONNECT ON DATABASE tododb TO claude_readonly;
 
 -- Grant usage on the public schema
 GRANT USAGE ON SCHEMA public TO claude_readonly;
@@ -24,4 +24,4 @@ ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT SELECT ON TABLES TO claude_reado
 -- \dp
 
 -- Connection string for .env:
--- DATABASE_URL=postgresql://claude_readonly:change-this-password@localhost:5432/todoDb
+-- DATABASE_URL=postgresql://claude_readonly:change-this-password@localhost:5432/tododb
