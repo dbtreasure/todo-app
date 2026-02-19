@@ -16,8 +16,20 @@ echo "[setup] Cloning branch '$BRANCH' into $WORK..."
 cd /tmp
 # Remove empty dir if it exists (created by Dockerfile for VS Code workspace)
 [ -d "$WORK" ] && [ -z "$(ls -A "$WORK" 2>/dev/null)" ] && rm -rf "$WORK"
-git clone --no-local --branch "$BRANCH" --single-branch /repo "$WORK"
-cd "$WORK"
+
+# The host repo (/repo) may only have the branch as a remote tracking ref
+# (origin/BRANCH), not a local branch. Try direct clone first; if that fails,
+# manually fetch the remote tracking ref.
+if git clone --no-local --branch "$BRANCH" --single-branch /repo "$WORK" 2>/dev/null; then
+    cd "$WORK"
+else
+    echo "[setup] Branch not found as local ref, trying remote tracking ref..."
+    git init "$WORK"
+    cd "$WORK"
+    git remote add repo /repo
+    git fetch repo "refs/remotes/origin/${BRANCH}:refs/heads/${BRANCH}"
+    git checkout "$BRANCH"
+fi
 
 echo ""
 echo "============================================"
