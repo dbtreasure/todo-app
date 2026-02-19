@@ -91,6 +91,7 @@ async def main():
             "Then explain the growth rate of the Fibonacci sequence."
         ),
         options=options,
+        cwd="/tmp/work",
     ):
         if isinstance(message, AssistantMessage):
             for block in message.content:
