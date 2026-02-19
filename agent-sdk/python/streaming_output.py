@@ -49,7 +49,7 @@ async def main():
                     print(block.text, end="", flush=True)
         elif isinstance(message, ResultMessage):
             print(f"\n\nDone.")
-            print(f"Cost: ${message.cost_usd:.4f}")
+            print(f"Cost: ${message.total_cost_usd:.4f}")
             print(f"Duration: {message.duration_ms}ms")
             print(f"Session ID: {message.session_id}")
 
