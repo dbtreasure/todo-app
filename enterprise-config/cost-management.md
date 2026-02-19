@@ -2,11 +2,11 @@
 
 ## Model Tiers
 
-| Model | Cost | Use For | Examples |
-|-------|------|---------|----------|
-| **Haiku** | $ | Simple tasks, fast iteration | Linting, formatting, simple Q&A, file search |
-| **Sonnet** | $$ | General development work | Code review, feature implementation, debugging |
-| **Opus** | $$$$ | Complex reasoning | Architecture decisions, security audits, system design |
+| Model | Input (per 1M tokens) | Output (per 1M tokens) | Use For |
+|-------|----------------------|------------------------|---------|
+| **Haiku 4.5** | $1.00 | $5.00 | Simple tasks, fast iteration — linting, formatting, simple Q&A |
+| **Sonnet 4.6** | $3.00 | $15.00 | General development — code review, feature implementation, debugging |
+| **Opus 4.6** | $5.00 | $25.00 | Complex reasoning — architecture decisions, security audits, system design |
 
 ## Cost Optimization Strategies
 
@@ -22,7 +22,7 @@
 - Scope agents with `maxTurns` to prevent runaway sessions
 
 ### 3. Budget Controls
-- Set `maxTurnsPerSession` in managed policies
+- Set `max_turns` in Agent SDK scripts to prevent runaway sessions
 - Monitor per-user and per-project spending
 - Set up alerts at 80% and 100% of budget thresholds
 - Review weekly cost reports to identify optimization opportunities
@@ -37,8 +37,8 @@
 ```
 Monthly Cost = Sum of (Input Tokens x Input Price + Output Tokens x Output Price)
 
-Approximate per-model pricing (check current rates):
-- Haiku:  ~$0.25/M input,  ~$1.25/M output
-- Sonnet: ~$3/M input,     ~$15/M output
-- Opus:   ~$15/M input,    ~$75/M output
+Current per-model pricing (as of early 2026):
+- Haiku 4.5:  $1.00/M input,  $5.00/M output
+- Sonnet 4.6: $3.00/M input,  $15.00/M output
+- Opus 4.6:   $5.00/M input,  $25.00/M output
 ```
