@@ -22,6 +22,10 @@ RUN printf '#!/bin/bash\nsed "s/\\r$//" /run-tests.sh | bash "$@"\n' > /usr/loca
 
 # Create non-root user (mimics WSL default user)
 RUN useradd -m -s /bin/bash testuser
+
+# Allow git to read the bind-mounted repo (owned by host user, not testuser)
+RUN git config --global --add safe.directory /repo
+
 USER testuser
 
 # uv (Python package manager) — installed as testuser
