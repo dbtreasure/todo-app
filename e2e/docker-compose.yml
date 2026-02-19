@@ -1,0 +1,14 @@
+services:
+  e2e:
+    build: .
+    volumes:
+      - ..:/repo:ro
+      - ./run-tests.sh:/run-tests.sh:ro
+      - ./format-log.py:/format-log.py:ro
+      - ./setup-workspace.sh:/setup-workspace.sh:ro
+      - ./logs:/home/testuser/.claude
+    environment:
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+      - BRANCH=${BRANCH:-17.1-agent-sdk-overview}
+      - TIER=${TIER:-T1}
+    entrypoint: ["bash", "/run-tests.sh"]

@@ -1,0 +1,5 @@
+services:
+  e2e:
+    entrypoint: ["sleep", "infinity"]
+    stdin_open: true
+    tty: true

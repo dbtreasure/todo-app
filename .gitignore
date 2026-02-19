@@ -1,3 +1,4 @@
 /node_modules
 /.next
 .env.local
+e2e/logs/
