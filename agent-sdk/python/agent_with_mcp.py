@@ -51,6 +51,7 @@ async def main():
             "Then show me the 5 most recent todos."
         ),
         options=options,
+        cwd="/tmp/work",
     ):
         if isinstance(message, AssistantMessage):
             for block in message.content:
