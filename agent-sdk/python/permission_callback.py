@@ -87,7 +87,7 @@ async def main():
         "and fix them."
     )
 
-    async for message in query(prompt=prompt, options=options):
+    async for message in query(prompt=prompt, options=options, cwd="/tmp/work"):
         if isinstance(message, AssistantMessage):
             for block in message.content:
                 if isinstance(block, TextBlock):

@@ -64,7 +64,7 @@ async def main():
         "and update the server actions to support it."
     )
 
-    async for message in query(prompt=prompt, options=options):
+    async for message in query(prompt=prompt, options=options, cwd="/tmp/work"):
         if isinstance(message, AssistantMessage):
             for block in message.content:
                 if isinstance(block, TextBlock):

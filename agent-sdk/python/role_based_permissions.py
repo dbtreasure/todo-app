@@ -131,7 +131,7 @@ async def run_with_role(role_name: str, task: str):
         max_turns=5,
     )
 
-    async for message in query(prompt=task, options=options):
+    async for message in query(prompt=task, options=options, cwd="/tmp/work"):
         if isinstance(message, AssistantMessage):
             for block in message.content:
                 if isinstance(block, TextBlock):
