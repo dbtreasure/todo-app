@@ -11,4 +11,4 @@ services:
       - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
       - BRANCH=${BRANCH:-17.1-agent-sdk-overview}
       - TIER=${TIER:-T1}
-    entrypoint: ["bash", "/run-tests.sh"]
+    entrypoint: ["run-tests"]
