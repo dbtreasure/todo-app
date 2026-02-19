@@ -124,8 +124,8 @@ This branch is configured for **Video 16.5: Building Custom MCP Servers** in the
 Building a production-grade custom MCP server with FastMCP — input validation, credential isolation, error handling.
 
 ### Files Added
-- `.claude/settings.json` — Custom user-service MCP registration
-- `mcp-server/user_service.py` — Full FastMCP server with user management tools
+- `.mcp.json` — Project-scoped MCP server registration (user-service)
+- `mcp-server/user_service.py` — Full FastMCP server with user management tools (includes PEP 723 inline script metadata for `uv run`)
 - `mcp-server/requirements.txt` — Python dependencies
 - `mcp-server/.env.example` — API credentials
 

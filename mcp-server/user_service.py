@@ -9,9 +9,17 @@ Usage:
     uv run mcp-server/user_service.py
 """
 
+# /// script
+# requires-python = ">=3.10"
+# dependencies = [
+#     "mcp>=1.0.0",
+#     "httpx>=0.27.0",
+#     "pydantic>=2.0.0",
+# ]
+# ///
+
 import logging
 import os
-from datetime import datetime
 
 import httpx
 from mcp.server.fastmcp import FastMCP
@@ -31,7 +39,7 @@ class GetUserRequest(BaseModel):
     @field_validator("user_id")
     @classmethod
     def validate_user_id(cls, v: str) -> str:
-        if not v.isalnum() and "-" not in v and "_" not in v:
+        if not all(c.isalnum() or c in '-_' for c in v):
             raise ValueError("user_id must be alphanumeric (hyphens and underscores allowed)")
         return v
 
@@ -60,12 +68,13 @@ def get_api_config() -> tuple[str, str]:
 # ── Tools ─────────────────────────────────────────────────────────
 
 @server.tool()
-async def get_user(request: GetUserRequest) -> dict:
-    """Get details for a specific user by ID.
+async def get_user(user_id: str) -> dict:
+    """Look up a user by their unique identifier.
 
     Returns user profile information including name, email, department, and role.
     Credentials are loaded from environment variables and never seen by the model.
     """
+    request = GetUserRequest(user_id=user_id)
     api_url, api_token = get_api_config()
 
     logger.info(f"Looking up user: {request.user_id}")
@@ -99,12 +108,13 @@ async def get_user(request: GetUserRequest) -> dict:
 
 
 @server.tool()
-async def list_users_by_department(request: ListUsersRequest) -> dict:
-    """List users in a specific department.
+async def list_users_by_department(department: str) -> dict:
+    """List all users in a specific department.
 
     Returns a list of users filtered by department name.
     Supports pagination via the limit parameter.
     """
+    request = ListUsersRequest(department=department)
     api_url, api_token = get_api_config()
 
     logger.info(f"Listing users in department: {request.department} (limit: {request.limit})")
