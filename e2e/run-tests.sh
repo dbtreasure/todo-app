@@ -250,8 +250,15 @@ run_t3() {
         fi
     done
 
-    # Ensure TS env exists
-    if [ ! -d /tmp/ts-env/node_modules ]; then
+    # Ensure TS env exists — check for branch package.json first
+    if [ -f "$WORK/agent-sdk/typescript/package.json" ]; then
+        echo "[T3] Found project package.json, running npm install..."
+        cd "$WORK/agent-sdk/typescript"
+        npm install 2>&1 | tail -3
+        # Also ensure tsx is available
+        npm list tsx >/dev/null 2>&1 || npm install tsx 2>&1 | tail -1
+        cd "$WORK"
+    elif [ ! -d /tmp/ts-env/node_modules ]; then
         mkdir -p /tmp/ts-env
         cd /tmp/ts-env
         npm init -y > /dev/null 2>&1
@@ -261,8 +268,15 @@ run_t3() {
 
     for f in "${TS_FILES[@]}"; do
         echo "[T3] Running: npx tsx $f"
-        # Run from the ts-env to pick up node_modules
-        if timeout 120 env NODE_PATH=/tmp/ts-env/node_modules npx --prefix /tmp/ts-env tsx "$WORK/$f" 2>&1; then
+        local ts_ok=false
+        if [ -f "$WORK/agent-sdk/typescript/package.json" ]; then
+            # Branch has its own package.json — run from that directory
+            timeout 120 npx --prefix "$WORK/agent-sdk/typescript" tsx "$WORK/$f" 2>&1 && ts_ok=true
+        else
+            # Fallback to shared ts-env
+            timeout 120 env NODE_PATH=/tmp/ts-env/node_modules npx --prefix /tmp/ts-env tsx "$WORK/$f" 2>&1 && ts_ok=true
+        fi
+        if $ts_ok; then
             echo "  PASS (execute): $f"
             pass=$((pass + 1))
         else
