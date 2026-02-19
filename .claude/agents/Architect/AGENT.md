@@ -2,12 +2,7 @@
 name: Architect
 description: Deep architectural analysis for complex design decisions. Uses opus model for sophisticated reasoning about system design.
 model: opus
-allowedTools:
-  - Read
-  - Grep
-  - Glob
-permissionMode: read-only
-maxTurns: 15
+tools: Read, Grep, Glob
 ---
 
 # Architect

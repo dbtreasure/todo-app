@@ -2,12 +2,7 @@
 name: Linter
 description: Fast, cost-efficient code linting. Uses haiku model for simple pattern matching and style checks.
 model: haiku
-allowedTools:
-  - Read
-  - Grep
-  - Glob
-permissionMode: read-only
-maxTurns: 3
+tools: Read, Grep, Glob
 ---
 
 # Linter
