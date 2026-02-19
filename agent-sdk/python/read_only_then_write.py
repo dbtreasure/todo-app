@@ -33,7 +33,7 @@ async def _collect_text(prompt: str, options: ClaudeAgentOptions) -> str:
                 if isinstance(block, TextBlock):
                     parts.append(block.text)
         elif isinstance(message, ResultMessage):
-            print(f"  Cost: ${message.cost_usd:.4f} | Duration: {message.duration_ms}ms")
+            print(f"  Cost: ${message.total_cost_usd:.4f} | Duration: {message.duration_ms}ms")
     return "\n".join(parts)
 
 
